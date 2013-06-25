@@ -65,7 +65,7 @@
                     }
                 ]]></getter>
             </property>
-            
+
             <property
                 name="disabled">
                 <getter><![CDATA[
@@ -94,11 +94,10 @@
 
     <binding id="label-attribute">
         <content>
-            <xul:label
+            <xul:description
                 anonid="label"
                 class="dcpLabel"
-                crop="center"
-                xbl:inherits="mode,required,value,tooltiptext=value" />
+                xbl:inherits="mode,required,xbl:text=value,tooltiptext=value" />
             <xul:label
                 anonid="separator"
                 class="dcpSeparator"
