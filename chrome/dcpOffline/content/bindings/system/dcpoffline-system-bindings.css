@@ -317,7 +317,7 @@ dcpDocument[mode=edit] dcpDateTimePicker {
 
 dcpDocument[mode=edit] dcpDatePicker {
     -moz-binding:
-        url("chrome://dcpoffline/content/bindings/system/dateTimePicker.xml#datePicker");
+        url("chrome://dcpoffline/content/bindings/system/dateMaskInput.xml#dateInput");
 }
 
 dcpDocument[mode=edit] dcpTimePicker {
