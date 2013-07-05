@@ -8,7 +8,7 @@ var EXPORTED_SYMBOLS = [ "context" ];
 
 var url = Preferences.get('dcpoffline.context.url');
 if(url == ''){
-    url = 'http://fakeurl.com';
+    url = 'http://localhost/';
 }
 
 var context = new Fdl.Context({
