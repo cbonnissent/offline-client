@@ -109,12 +109,13 @@
                         currentNode = this.lineTemplate[i];
 
                         /* Generate label line */
-                        currentLabel = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "label");
-                        currentLabel.setAttribute('value', currentNode.getAttribute('label'));
+                        currentLabel = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "description");
+                        currentLabel.textContent = currentNode.getAttribute('label');
                         currentLabel.setAttribute('tooltiptext', currentNode.getAttribute('label'));
                         currentLabel.setAttribute('visibility', currentNode.getAttribute('visibility'));
                         currentLabel.classList.add('header');
                         currentLabel.classList.add('plain');
+                        currentLabel.classList.add('dcpArrayLabel');
                         headerRow.appendChild(currentLabel);
 
                         /*Generate column content */

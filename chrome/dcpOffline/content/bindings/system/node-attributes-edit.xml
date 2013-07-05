@@ -117,13 +117,14 @@
                                     value = [];
                                 }
                                 value.splice(rowIndex, 0, '');
+                            
                                 this.doc.setValue(attrid, value);
                             }
                         }
 
                         this.rows.insertBefore(currentRow, this.rows.childNodes[indexInGrid-1].nextSibling); // ==insertAfter or append
-
-                        if(!noReindex){
+                        
+                        if(! noReindex){
                             this.reindexRows(rowIndex);
                         }
                     } catch(e) {
@@ -221,10 +222,12 @@
 
                 for (i = 0; i < this.lineTemplate.length; ++i) {
                     clabel = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "label");
-                    clabel.setAttribute("value", this.lineTemplate[i].getAttribute('label'));
-                    clabel.setAttribute("tooltiptext", this.lineTemplate[i].getAttribute('label'));
+                    clabel.textContent = this.lineTemplate[i].getAttribute('label');
+                    clabel.setAttribute("visibility", this.lineTemplate[i].getAttribute('visibility'));
+                    clabel.setAttribute("tooltiptext", this.childAttributes[i].getAttribute('label'));
                     clabel.classList.add('header');
                     clabel.classList.add('plain');
+                    clabel.classList.add('dcpArrayLabel');
 
                     currentRow.appendChild(clabel);
 

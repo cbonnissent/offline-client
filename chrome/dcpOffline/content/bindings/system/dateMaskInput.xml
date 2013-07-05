@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE bindings >
+<bindings
+    id="dateMaskInput"
+    xmlns="http://www.mozilla.org/xbl"
+    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:xbl="http://www.mozilla.org/xbl">
+
+    <binding id="dateInput">
+
+        <implementation>
+            <property name="value">
+                <getter><![CDATA[
+                    Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    var value;
+                    this.deleteIfInvalide();
+                    value = this.input.value;
+                    if (value) {
+                        return maskDateUtil.getIsoRepresentation(value, this.tokens);
+                    }
+                    return "";
+                ]]></getter>
+                <setter><![CDATA[
+                    Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    if(val !== ''){
+                       val = maskDateUtil.getLocaleRepresentation(val, this.tokens);
+                    }
+                    this.input.value = val;
+                    this.validateInput(true);
+                ]]></setter>
+            </property>
+            <property name="position">
+                <getter><![CDATA[
+                    var input = this.input;
+                    return {
+                         begin : input.selectionStart,
+                         end : input.selectionEnd
+                    };
+                ]]></getter>
+            </property>
+            <property name="tokens">
+                <getter><![CDATA[
+                    Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    return maskDateUtil.generateFormatTokens("dateFormat");
+                ]]></getter>
+            </property>
+            <property name="validationRegExp">
+                <getter><![CDATA[
+                    Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    return maskDateUtil.generateRegExp(this.tokens);
+                ]]></getter>
+            </property>
+            <property name="mask">
+                <getter><![CDATA[
+                    Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    return maskDateUtil.generateMask(this.tokens);
+                ]]></getter>
+            </property>
+            <property name="input">
+                <getter><![CDATA[
+                      return document.getAnonymousElementByAttribute(this, "anonid", "displayValue");
+                ]]></getter>
+            </property>
+            <property name="dateIsValid">
+                <getter><![CDATA[
+                     Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    return maskDateUtil.checkDate(this.input.value, this.tokens);
+                ]]></getter>
+            </property>
+            <method name="getChild">
+                <parameter name="aChildName" />
+                <body><![CDATA[
+                      return document.getAnonymousElementByAttribute(this, "anonid", aChildName);
+                ]]></body>
+            </method>
+            <method name="analyzeInput">
+                <parameter name="position" />
+                <parameter name="currentChar" />
+                <parameter name="currentRegExps" />
+                <body><![CDATA[
+                    var input = this.input,
+                    currentRegexp = currentRegExps[position.begin], currentValue;
+                      currentValue = input.value;
+                      if (!currentRegexp) {
+                        return;
+                      }
+                      if (!currentRegexp.test) {
+                        input.setSelectionRange(position.begin+1, position.end+1);
+                        position.begin = position.begin+1;
+                        position.end = position.end+1;
+                        this.analyzeInput(position, currentChar, currentRegExps);
+                        return;
+                      }
+                      if (!currentRegexp.test(currentChar)) {
+                        return;
+                      }
+                      currentValue = currentValue.substring(0,position.begin)+currentChar+currentValue.substring(position.begin+1);
+                      input.value = currentValue;
+                      input.setSelectionRange(position.begin+1, position.end+1);
+                    ]]></body>
+            </method>
+            <method name="validateInput">
+                <parameter name="displayOnlyValide" />
+                <body><![CDATA[
+                    Components.utils.import("resource://modules/dateMaskUtil.jsm");
+                    Components.utils.import("resource://modules/StringBundle.jsm");
+                    var description = this.getChild("validateDate"),
+                        translate = new StringBundle("chrome://dcpoffline/locale/main.properties");
+                    if (this.dateIsValid) {
+                        description.value = maskDateUtil.getLiteralDate(this.input.value, this.tokens);
+                    } else if(!displayOnlyValide) {
+                      description.value = translate.get("date.maskInput.invalidDate");
+                    }
+                ]]></body>
+            </method>
+            <method name="deleteIfInvalide">
+                <body><![CDATA[
+                    var description = this.getChild("validateDate");
+                    if (!this.dateIsValid) {
+                        this.input.value = "";
+                        description.value = "";
+                    }
+                ]]></body>
+            </method>
+            <method name="handleSuppress">
+                <parameter name="event" />
+                <body><![CDATA[
+                        var position, input = this.input, currentValue = input.value;
+                        if (event.which === 8 || event.which === 46) {
+                            event.preventDefault();
+                            position = this.position;
+                            if (event.which === 8) {
+                                position.begin = position.begin-1;
+                                position.end = position.end;
+                            } else {
+                                position.begin = position.begin;
+                                position.end = position.end+1;
+                            }
+                            currentValue = currentValue.substring(0,position.begin)+
+                            this.mask.substring(position.begin, position.end)+
+                            currentValue.substring(position.end);
+                            input.value = currentValue;
+                            if (event.which === 8) {
+                                input.setSelectionRange(position.begin, position.begin);
+                            } else {
+                                input.setSelectionRange(position.begin+1, position.begin+1);
+                            }
+                            this.validateInput();
+                            return;
+                        }
+                ]]></body>
+            </method>
+            <method name="checkInput">
+                <parameter name="event" />
+                <body><![CDATA[
+                    var currentChar = String.fromCharCode(event.charCode);
+                    event.preventDefault();
+                    this.analyzeInput(this.position, currentChar, this.validationRegExp);
+                    this.validateInput();
+                ]]></body>
+            </method>
+        </implementation>
+
+        <handlers>
+            <handler event="keypress"><![CDATA[
+                if (event.which < 32) {
+                   return;
+                }
+                event.preventDefault();
+                this.checkInput(event);
+            ]]></handler>
+            <handler event="keydown"><![CDATA[
+                this.handleSuppress(event);
+            ]]></handler>
+            <handler event="focus"><![CDATA[
+                var currentInput = this.input;
+                if (!currentInput.value) {
+                    currentInput.value = this.mask;
+                    window.setTimeout(function() {
+                        currentInput.setSelectionRange(0, 0);
+                    }, 1);
+                }
+            ]]></handler>
+            <handler event="blur"><![CDATA[
+                this.deleteIfInvalide();
+            ]]></handler>
+        </handlers>
+
+        <content>
+            <xul:vbox>
+                <xul:textbox
+                    anonid="displayValue"
+                    class="dcpValue"
+                    multiline="false"
+                    xbl:inherits="disabled" />
+                <xul:description anonid="validateDate" />
+            </xul:vbox>
+        </content>
+    </binding>
+
+</bindings>
