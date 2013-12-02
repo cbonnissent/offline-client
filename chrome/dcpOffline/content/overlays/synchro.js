@@ -39,6 +39,9 @@ function addObserver() {
         },
         onGlobalPercent : function(p) {
             document.getElementById('progressGlobal').value = p;
+            if (p === 100) {
+                applicationEvent.publish("postSynchronize");
+            }
         },
         onDetailLabel : function(t) {
             appendText(t);
