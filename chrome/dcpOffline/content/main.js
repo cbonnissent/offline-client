@@ -668,8 +668,10 @@ function updateAbstractList(config) {
         document.getElementById("searchTitleParam").textContent = '%'
             + config.searchValue + '%';
     }
-    document.getElementById("abstractList").builder.rebuild();
-    document.getElementById("abstractList").selectedIndex = -1;
+    window.setTimeout(function() {
+        document.getElementById("abstractList").builder.rebuild();
+        document.getElementById("abstractList").selectedIndex = -1;
+    }, 25);
     // applicationEvent.publish("postUpdateAbstractList");
 }
 /**

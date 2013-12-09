@@ -14,8 +14,9 @@ locale      dcpoffline      kl           locale/kl_GN/
 content branding chrome/branding/
 
 ## locales
-locale      branding        fr           locale/fr_FR/
-locale      branding        en           locale/en_US/
+locale      branding        fr           locale/fr_FR/branding/
+locale      branding        en           locale/en_US/branding/
+locale      branding        kl           locale/kl_GN/branding/
 
 #################################
 
