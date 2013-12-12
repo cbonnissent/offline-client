@@ -9,10 +9,10 @@ function initDialog() {
 
     if (result) {
         if (result.description) {
-            if (result.description.status) {
+            if (result.description.hasOwnProperty("status")) {
                 if (result.description.status == "successTransaction") {
                     document.getElementById("resultStatus").value = getText("synchronize.success");
-                } else if (result.description.status == "abortTransaction") {
+                } else if (result.description.status == "abortTransaction" || result.description.status === false) {
                     document.getElementById("resultStatus").value = getText("synchronize.fail");
                 } else {
                     document.getElementById("resultStatus").value = result.description.status;
@@ -26,11 +26,7 @@ function initDialog() {
 
             if (result.description.message) {
                 document.getElementById("message").hidden = false;
-                try {
-                    document.getElementById("message").value = result.description.toString();
-                } catch (e) {
-                    document.getElementById("message").value = result.description.message;
-                }
+                document.getElementById("message").value = result.description.message;
             }
         } else {
             if (result.result) {
@@ -90,7 +86,6 @@ function computeReportPath(domainName){
     reportFile.append('Logs');
     reportFile.append('report-' + domainName + '.html');
     if(reportFile.exists()){
-        logConsole("I exist !");
         return reportFile.path;
     } else {
         return false;
