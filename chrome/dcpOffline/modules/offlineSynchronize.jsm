@@ -161,11 +161,32 @@ offlineSynchronize.prototype.recordFamilies = function(config) {
         logConsole('pull families : ');
         this.callObserver('onDetailLabel',"retrieve families definition");
         var fam = null;
+
         for ( var i = 0; i < families.length; i++) {
             fam = families.getDocument(i);
 
             logConsole('pull families : ' + fam.getTitle());
             this.log('pull families : ' + fam.getTitle());
+
+            var j, currentFamDef, newAttributes, checkFam = storageManager.execQuery({
+                query : "select json_object from families where name=:famname",
+                params : {
+                    famname : fam.getProperty('name')
+                }
+            });
+
+            if (checkFam.length > 0) {
+                currentFamDef = JSON.parse(checkFam[0].json_object);
+                newAttributes = fam.getAttributes();
+                for (j in newAttributes) {
+                    if (newAttributes.hasOwnProperty(j)) {
+                        if (!currentFamDef["attributes"][j] || newAttributes[j]["type"] !== currentFamDef["attributes"][j]["type"]) {
+                            this.callObserver('onError', "There is a modification in fam definition.");
+                            throw "There is a modification in fam definition.";
+                        }
+                    }
+                }
+            }
             
             var ricon=storageManager.execQuery({
                 query : "select icon from families where name=:famname",
@@ -177,7 +198,6 @@ offlineSynchronize.prototype.recordFamilies = function(config) {
             if (ricon.length > 0) {
                 icon=ricon[0].icon;
             }
-            
             
             storageManager
                     .execQuery({
@@ -351,8 +371,9 @@ offlineSynchronize.prototype.isEditable = function(config) {
 offlineSynchronize.prototype.setObservers = function(config) {
     if (config) {
         this.observers = {};
-        for ( var i in config)
+        for (var i in config) {
             this.observers[i] = config[i];
+        }
     }
 };
 

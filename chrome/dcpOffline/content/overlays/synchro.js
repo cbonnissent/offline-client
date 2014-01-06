@@ -104,9 +104,13 @@ function synchronize() {
             id : Preferences.get("offline.user.currentSelectedDomain")
         });
         document.getElementById('progress').mode = 'undetermined';
-        offlineSync.synchronizeDomain({
-            domain : domain
-        });
+        try {
+            offlineSync.synchronizeDomain({
+                domain : domain
+            });
+        } catch(exception) {
+            applicationEvent.publish("unableToSynchronize",{reason : exception});
+        }
     } else {
         applicationEvent.publish("unableToSynchronize",{reason : translate.get("synchronize.noDomainSelected")});
         return false;
@@ -148,7 +152,7 @@ function endSynchronize(result) {
 function errorOfSynchronize(result) {
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
-    applicationEvent.publish("postSynchronize", {result : false, description : result});
+    applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
     document.getElementById("cancelButton").disabled = false;
 };
 

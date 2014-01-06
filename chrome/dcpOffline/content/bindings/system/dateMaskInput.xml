@@ -183,7 +183,11 @@
                 }
             ]]></handler>
             <handler event="blur"><![CDATA[
+                var event;
                 this.deleteIfInvalide();
+                event = document.createEvent("HTMLEvents");
+                event.initEvent("change", true, true); // event type,bubbling,cancelable
+                return !this.input.dispatchEvent(event);
             ]]></handler>
         </handlers>
 
