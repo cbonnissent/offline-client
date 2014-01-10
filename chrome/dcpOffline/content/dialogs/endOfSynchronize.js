@@ -3,7 +3,7 @@ Components.utils.import("resource://modules/logger.jsm");
 
 function initDialog() {
 
-    var result = window.arguments[0], reportPath;
+    var result = window.arguments[0], reportPath, message = "", currentElement;
 
     logConsole('endSync', result);
 
@@ -24,9 +24,14 @@ function initDialog() {
                 document.getElementById("onlineSpaceLink").tooltipText = result.description.manageWaitingUrl;
             }
 
-            if (result.description.message) {
+            if (result.description.message && result.description.message.detailStatus) {
                 document.getElementById("message").hidden = false;
-                document.getElementById("message").value = result.description.message;
+                for(currentElement in result.description.message.detailStatus) {
+                    if (result.description.message.detailStatus.hasOwnProperty(currentElement) && result.description.message.detailStatus[currentElement].statusMessage) {
+                        message += result.description.message.detailStatus[currentElement].statusMessage+"\n";
+                    }
+                }
+                document.getElementById("message").value = message;
             }
         } else {
             if (result.result) {
@@ -35,7 +40,7 @@ function initDialog() {
                 document.getElementById("resultStatus").value = getText("synchronize.fail");
             }
         }
-    }else  {
+    } else  {
         document.getElementById("resultStatus").collapsed = true;
         document.getElementById("resultLabel").collapsed = true;
     }
