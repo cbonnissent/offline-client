@@ -596,8 +596,12 @@
                         var title = lfile.leafName;
                         //logConsole("test file", lfile);
                         valueNode.value = title;
-
                         valueNode.classList.add('link');
+                    } else {
+                        var translate = new StringBundle(
+                                                        "chrome://dcpoffline/locale/bindings/leaf-attributes-binding.properties");
+
+                        valueNode.value = translate.get('attr.no.file');
                     }
                 ]]>
             </constructor>
