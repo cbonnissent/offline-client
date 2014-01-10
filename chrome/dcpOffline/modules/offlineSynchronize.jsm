@@ -930,6 +930,8 @@ offlineSynchronize.prototype.deleteDocuments = function(config) {
             this.log("delete documents :"+sinitids);
             var callback={
                     handleCompletion : function() {
+
+                    logConsole("clean delete documents / 2" );
                         // clean database
                         storageManager.execQuery({
                             query :"delete from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"});
@@ -959,6 +961,12 @@ offlineSynchronize.prototype.deleteDocuments = function(config) {
 
 
             logConsole("deleteDocuments", config.deleteList );
+        } else {
+            logConsole("clean delete documents / 1" );
+            storageManager.execQuery({
+                     query :"delete from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"});
+            storageManager.execQuery({
+                     query :"delete from documents where initid not in (select initid from docsbydomain)"});
         }
 
     } else {
