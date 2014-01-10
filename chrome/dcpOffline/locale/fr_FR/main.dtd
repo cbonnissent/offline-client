@@ -42,8 +42,8 @@
 <!ENTITY synchronize.cancel                     "Annuler">
 <!ENTITY synchronize.synchronize                "Synchroniser">
 <!ENTITY synchro.progress                       "Avancement">
-<!ENTITY synchro.progressGlobal                 "global">
-<!ENTITY synchro.progressDetail                 "détail">
+<!ENTITY synchro.progressGlobal                 "Global">
+<!ENTITY synchro.progressDetail                 "Détail">
 <!ENTITY synchro.progressMessages               "Messages de la synchronisation">
 <!ENTITY synchro.domain                         "Domaine de synchronisation">
 <!ENTITY synchro.detail                         "Détails">
