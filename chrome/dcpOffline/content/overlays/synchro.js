@@ -30,7 +30,7 @@ function isServerOK() {
         document.getElementById("synchronizeButton").disabled = true;
         applicationEvent.publish("unableToSynchronize",{reason : translate.get("synchronize.notConnected")});
     }
-};
+}
 
 function addObserver() {
     offlineSync.setObservers({
@@ -39,9 +39,6 @@ function addObserver() {
         },
         onGlobalPercent : function(p) {
             document.getElementById('progressGlobal').value = p;
-            if (p === 100) {
-                applicationEvent.publish("postSynchronize");
-            }
         },
         onDetailLabel : function(t) {
             appendText(t);
@@ -88,13 +85,13 @@ function initPage() {
     }else {
         applicationEvent.publish("unableToSynchronize",{reason : translate.get("synchronize.noDomainSelected")});
     }
-};
+}
 
 function initListeners() {
     applicationEvent.subscribe("synchronize", synchronize, {onError : errorOfSynchronize});
     applicationEvent.subscribe("changeSelectedDomain", updateDomain);
     window.addEventListener("close", canBeClosed, false);
-};
+}
 
 function synchronize() {
     var translate = new StringBundle(
@@ -115,7 +112,7 @@ function synchronize() {
         applicationEvent.publish("unableToSynchronize",{reason : translate.get("synchronize.noDomainSelected")});
         return false;
     }
-};
+}
 
 function updateDomain(config) {
     if (config && config.domainId) {
@@ -126,7 +123,7 @@ function updateDomain(config) {
             Services.prompt.alert(window, "synchronize.unableToDisplayDomainDescription", e);
         }
     }
-};
+}
 
 function tryToSynchronize() {
     if (!applicationEvent.publish("preSynchronize")) {
@@ -140,21 +137,21 @@ function tryToSynchronize() {
         }
     }
     
-};
+}
 
 function endSynchronize(result) {
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
     applicationEvent.publish("postSynchronize", {result : true, description : result});
     document.getElementById("cancelButton").disabled = false;
-};
+}
 
 function errorOfSynchronize(result) {
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
     applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
     document.getElementById("cancelButton").disabled = false;
-};
+}
 
 /*Close IHM*/
 function canBeClosed(event) {
@@ -164,56 +161,56 @@ function canBeClosed(event) {
     else {
         letClose();
     }
-};
+}
 
 function letClose() {
     applicationEvent.unsubscribe("synchronize", synchronize);
     applicationEvent.unsubscribe("changeSelectedDomain", updateDomain);
     window.close();
-};
+}
 
 /*Update IHM*/
 function myAddDocumentsToRecord(delta) {
     var r = document.getElementById('documentsToRecord');
     r.value = parseInt(r.value) + delta;
-};
+}
 
 function myAddDocumentsRecorded(delta) {
     var r = document.getElementById('documentsRecorded');
     r.value = parseInt(r.value) + delta;
 
-};
+}
 function myAddFilesToRecord(delta) {
 
     var r = document.getElementById('filesToRecord');
     r.value = parseInt(r.value) + delta;
-};
+}
 
 function myAddFilesRecorded(delta) {
 
     var r = document.getElementById('filesRecorded');
     r.value = parseInt(r.value) + delta;
-};
+}
 
 function myAddDocumentsToSave(delta) {
     var r = document.getElementById('documentsToSave');
     r.value = parseInt(r.value) + delta;
-};
+}
 
 function myAddDocumentsSaved(delta) {
     var r = document.getElementById('documentsSaved');
     r.value = parseInt(r.value) + delta;
-};
+}
 function myAddFilesToSave(delta) {
     var r = document.getElementById('filesToSave');
     r.value = parseInt(r.value) + delta;
-};
+}
 
 function myAddFilesSaved(delta) {
 
     var r = document.getElementById('filesSaved');
     r.value = parseInt(r.value) + delta;
-};
+}
 
 function appendText(text) {
     document.getElementById('progressMessages').value += text + "\n";

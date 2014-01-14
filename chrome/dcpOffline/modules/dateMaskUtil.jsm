@@ -180,6 +180,9 @@ var maskDateUtil = {};
 
     maskDateUtil.getLocaleRepresentation = function(isoValue, formatTokens) {
         var date = moment(isoValue, "YYYY-MM-DD");
+        if (!date) {
+            return "";
+        }
         return strftime(date, formatTokens);
     };
 
