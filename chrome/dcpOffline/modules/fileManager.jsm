@@ -38,6 +38,8 @@ var fileDwldProgress = {};
 var fileManager = {
     saveFile : function saveFile(config) {
 
+        var copiedFile;
+
         if (config && config.initid && config.attrid && config.basename
                 && config.aFile) {
             try {
@@ -84,11 +86,20 @@ var fileManager = {
                             }
                         } catch (e) {
                             logError('fileManager::saveFile : could not move the file to '
-                                    + filesRoot.path);
+                                    + destDir.path);
                             logError(e);
+                            //Try to detect if error is a false positive sic
+                            // If it's a false positive change aFile ref to good ref
+                            copiedFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+                            copiedFile.initWithPath(destDir.path);
+                            copiedFile.append(config.basename);
+                            if(copiedFile && copiedFile.exists()){
+                                log('The file exists restore the path : '+copiedFile.path);
+                                config.aFile = copiedFile;
+                            }
                         }
                     }
-                    // logConsole('save in '+destDir.path);
+                    //logConsole('save in '+destDir.path);
                     config.aFile.permissions = config.writable
                             ? PERMISSIONS_WRITABLE
                             : PERMISSIONS_NOT_WRITABLE;
