@@ -153,96 +153,92 @@ offlineSynchronize.prototype.synchronizeDomain = function(config) {
     }
 };
 offlineSynchronize.prototype.recordFamilies = function(config) {
-    logConsole('recordFamilies ');
+    logConsole('enter in recordFamilies ');
 
     if (config && config.domain) {
         var domain = config.domain;
         var families = domain.getAvailableFamilies();
-        logConsole('pull families : ');
+        logConsole('get families definition ');
         this.callObserver('onDetailLabel',"retrieve families definition");
         var fam = null;
 
         for ( var i = 0; i < families.length; i++) {
             fam = families.getDocument(i);
-
-            logConsole('pull families : ' + fam.getTitle());
-            this.log('pull families : ' + fam.getTitle());
-
             var j, currentFamDef, newAttributes, checkFam = storageManager.execQuery({
-                query : "select json_object from families where name=:famname",
-                params : {
-                    famname : fam.getProperty('name')
-                }
-            });
-
-            if (checkFam.length > 0) {
-                currentFamDef = JSON.parse(checkFam[0].json_object);
-                newAttributes = fam.getAttributes();
-                for (j in newAttributes) {
-                    if (newAttributes.hasOwnProperty(j)) {
-                        if (!currentFamDef["attributes"][j] || newAttributes[j]["type"] !== currentFamDef["attributes"][j]["type"]) {
-                            this.callObserver('onError', "There is a modification in fam definition.");
-                            throw "There is a modification in fam definition.";
-                        }
-                    }
-                }
-            }
-            
-            var ricon=storageManager.execQuery({
-                query : "select icon from families where name=:famname",
-                params : {
-                    famname : fam.getProperty('name')
-                }
-            });
-            var icon='';
-            if (ricon.length > 0) {
-                icon=ricon[0].icon;
-            }
-            
-            storageManager
-                    .execQuery({
-                        query : "insert into families(famid, name, title, json_object, creatable, icon) values(:famid, :famname, :famtitle, :fam, :creatable, :icon)",
-                        params : {
-                            famid : fam.getProperty('id'),
-                            famtitle : fam.getTitle(),
-                            famname : fam.getProperty('name'),
-                            fam : JSON.stringify(fam),
-                            creatable : fam.control('icreate'),
-                            icon:icon
-                        }
-                    });
-            // view generation
-            storageManager.initFamilyView(fam);
-            this.filesToDownload.push({
-                url : fam.getIcon({
-                    width : 48
-                }),
-                basename : fam.getProperty('name') + '.png',
-                index : -1,
-                attrid : 'icon',
-                initid : fam.getProperty('id'),
-                writable : false
-            });
-            storageManager
-                    .execQuery({
-                        query : "insert into docsbydomain (initid, domainid, editable) values (:initid, :domainid, 0)",
-                        params : {
-                            initid : fam.getProperty('id'),
-                            domainid : domain.getProperty('initid')
-                        },
-                        callback : {
-                            handleCompletion : function() {
-                            },
-                            handleError : function(reason) {
-                                logError('recordFamilies error:' + reason);
+                            query : "select json_object from families where name=:famname",
+                            params : {
+                                famname : fam.getProperty('name')
                             }
-                        }
-                    });
+                        });
+
+            var familyAlreadyLoaded=(checkFam.length > 0);
+            if (familyAlreadyLoaded) {
+                // TODO : add a test to detect incompatibilities family change
+            }
+
+            if (!familyAlreadyLoaded) {
+                logConsole('load family : ' + fam.getTitle());
+                this.log('load family : ' + fam.getTitle());
+                var ricon=storageManager.execQuery({
+                                query : "select icon from families where name=:famname",
+                                params : {
+                                    famname : fam.getProperty('name')
+                                }
+                            });
+                            var icon='';
+                            if (ricon.length > 0) {
+                                icon=ricon[0].icon;
+                            }
+                storageManager
+                        .execQuery({
+                            query : "insert into families(famid, name, title, json_object, creatable, icon) values(:famid, :famname, :famtitle, :fam, :creatable, :icon)",
+                            params : {
+                                famid : fam.getProperty('id'),
+                                famtitle : fam.getTitle(),
+                                famname : fam.getProperty('name'),
+                                fam : JSON.stringify(fam),
+                                creatable : fam.control('icreate'),
+                                icon:icon
+                            }
+                        });
+                // view generation
+                storageManager.initFamilyView(fam);
+                this.filesToDownload.push({
+                    url : fam.getIcon({
+                        width : 48
+                    }),
+                    basename : fam.getProperty('name') + '.png',
+                    index : -1,
+                    attrid : 'icon',
+                    initid : fam.getProperty('id'),
+                    writable : false
+                });
+                storageManager
+                        .execQuery({
+                            query : "insert into docsbydomain (initid, domainid, editable) values (:initid, :domainid, 0)",
+                            params : {
+                                initid : fam.getProperty('id'),
+                                domainid : domain.getProperty('initid')
+                            },
+                            callback : {
+                                handleCompletion : function() {
+                                },
+                                handleError : function(reason) {
+                                    logError('recordFamilies error:' + reason);
+                                }
+                            }
+                        });
+                this.log("record family : " + fam.getTitle());
+                logConsole("record family : " + fam.getTitle());
+                this.callObserver('onDetailLabel',
+                                    ("record family : " + fam.getTitle()));
+            } else {
+                this.log("skip family : " + fam.getTitle());
+            }
             this.updateEnumItems({
                 document : fam
             });
             this.callObserver('onAddFilesToRecord', 1);
-            this.log("record family :" + fam.getTitle());
         }
     } else {
         throw new ArgException("recordFamilies need domain parameter");
