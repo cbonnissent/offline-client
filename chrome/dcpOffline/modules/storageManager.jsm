@@ -571,6 +571,9 @@ var storageManager = {
             if(! initid ){
                 throw "saveDocumentValues ::missing initid argument";
             }
+            if (config.fromid > 0 && config.properties.fromid > 0 && config.properties.fromid != config.fromid) {
+                throw "ambiguous fromid ["+config.fromid + '/'+config.properties.fromid + "when save ";
+            }
             var fromid = config.fromid || config.properties.fromid;
             if(fromid){
                 try{
@@ -587,9 +590,13 @@ var storageManager = {
                         var value = properties[propertyId];
                         if (value && (Array.isArray(value) || typeof value=='object')) {
                             value = JSON.stringify(value);
-                        } 
-                        columns.push(propertyId);
-                        params[propertyId] = value;
+                        }
+                        if (typeof params[propertyId] == "undefined") {
+                            columns.push(propertyId);
+                            params[propertyId] = value;
+                        } else {
+                            throw "duplicate property ["+propertyId+ "when save ";
+                        }
                     }
                     
                     for( let attrId in attributes ){
@@ -631,9 +638,12 @@ var storageManager = {
                                         value = value;
                                 }
                             }
-                            
-                            columns.push(mapAttribute.columnid);
-                            params[mapAttribute.columnid] = value;
+                            if (typeof params[mapAttribute.columnid] == "undefined") {
+                                columns.push(mapAttribute.columnid);
+                                params[mapAttribute.columnid] = value;
+                             } else {
+                                 throw "duplicate attribute value ["+attrId+ "when save ";
+                            }
                         }
                     }
                     
