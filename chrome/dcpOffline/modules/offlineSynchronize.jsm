@@ -139,15 +139,11 @@ offlineSynchronize.prototype.synchronizeDomain = function(config) {
         this.pushDocuments({
             domain : domain,
             onComplete:function () {
-                //logConsole("oncomplete", domain);
                 me.pullDocuments({
                     domain : domain
                 });
             }
         });
-       /* this.pullDocuments({
-            domain : domain
-        });*/
     } else {
         throw new ArgException("synchronizeDomain need domain parameter");
     }
@@ -340,8 +336,6 @@ offlineSynchronize.prototype.isEditable = function(config) {
     if (config && config.domain && config.document) {
         var domain = config.domain;
         var document = config.document;
-        // log2(document.id+' --'+domain.id +
-        // '='+document.getProperty('lockdomainid')+':'+document.getProperty('locked')+'='+document.context.getUser().id);
         if (document.getProperty('lockdomainid') != domain.getProperty('id'))
             return false;
         if (document.getProperty('locked') != document.context.getUser().id)
@@ -386,18 +380,13 @@ offlineSynchronize.prototype.pendingPushFiles = function(config) {
     if (config && config.files && config.localDocument) {
         for ( var i = 0; i < config.files.length; i++) {
             var file = config.files[i];
-           // logConsole(config.localDocument.getInitid(), file);
-          //  logConsole("test:" + file.initid + '?='+ config.localDocument.getInitid() + ']');
             if (file.initid == config.localDocument.getInitid()) {
-
-               // logConsole("test success:" + file.initid + '?=' + config.localDocument.getInitid());
                 this.filesToUpload.push({
                     path : file.path,
                     attrid : file.attrid,
                     index : file.index,
                     initid : file.initid
                 });
-                //logConsole("uploads", this.filesToUpload);
                 this.callObserver('onAddFilesToSave', 1);
                 this.log('saving file ' + file.basename);
             }
@@ -558,34 +547,43 @@ offlineSynchronize.prototype.recordFiles = function(config) {
                 },
                 completeFileCallback : function() {
                     //logConsole('end files', this.filesToDownload);
-                    if (me.synchroResults) {
-                        if (me.synchroResults.status != "successTransaction") {
-                            me.callObserver('onError', me.synchroResults);
-                        } else {
-                            me.callObserver('onSuccess', me.synchroResults);
-                        }
-                    } else {
-                        me.callObserver('onSuccess', true);
-                    }
                     me.log('all files recorded');
                     me.recordFilesInProgress = false;
                     fileManager.initModificationDates();
                     me.updateWorkTables();
                     me.updateDomainSyncDate(config);
-                    if (config.onAfterRecord) {
-                        config.onAfterRecord();
+                    if (config.hasOwnProperty("onAfterRecord")) {
+                        if (config.onAfterRecord) {
+                            config.onAfterRecord();
+                        }
+                    } else {
+                        if (me.synchroResults) {
+                            if (me.synchroResults.status != "successTransaction") {
+                                me.callObserver('onError', me.synchroResults);
+                            } else {
+                                me.callObserver('onSuccess', me.synchroResults);
+                            }
+                        } else {
+                            me.callObserver('onSuccess', true);
+                        }
                     }
                 }
             });
         } else {
-            if (this.synchroResults) {
-                if (this.synchroResults.status != "successTransaction") {
-                    this.callObserver('onError', this.synchroResults);
-                } else {
-                    this.callObserver('onSuccess', this.synchroResults);
+            if (config.hasOwnProperty("onAfterRecord")) {
+                if (config.onAfterRecord) {
+                    config.onAfterRecord();
                 }
             } else {
-                this.callObserver('onSuccess', true);
+                if (this.synchroResults) {
+                    if (this.synchroResults.status != "successTransaction") {
+                        this.callObserver('onError', this.synchroResults);
+                    } else {
+                        this.callObserver('onSuccess', this.synchroResults);
+                    }
+                } else {
+                    this.callObserver('onSuccess', true);
+                }
             }
         }
     }
@@ -668,8 +666,9 @@ offlineSynchronize.prototype.getRecordedDocuments = function(config) {
 };
 
 offlineSynchronize.prototype.retrieveReport = function(config) {
-    logConsole("retrieveReport");
+    logConsole("retrieve report");
     if (config && config.domain ) {
+        this.callObserver("onDetailLabel", 'retrieve report');
         var report = config.domain.sync().getReport();
         var reportFile=this.getReportFile({domainId:config.domain.id});
         this.writeFile({
@@ -827,31 +826,28 @@ offlineSynchronize.prototype.recordDocument = function(config) {
  * @param domain
  */
 offlineSynchronize.prototype.pullDocuments = function(config) {
+    Components.utils.import("resource://modules/events.jsm");
+    var onedoc, j = 0, domain = config.domain;
     if (config && config.domain) {
-
-        var domain = config.domain;
-        var j=0;
         // TODO pull all documents and modifies files
         logConsole('pull : ');
         this.pullBeginDate=new Date();
         storageManager.lockDatabase({
             lock : true
         });
-        logDebug('testpullDocuments');
         this.callObserver('onDetailPercent', 0);
         this.callObserver('onGlobalPercent', 0);
         this.callObserver('onDetailLabel',
                 (domain.getTitle() + ':get shared documents'));
         
         var shared = domain.sync().getSharedDocuments({
-         //until : this.getDomainSyncDate({domain:config.domain})
             stillRecorded:this.getRecordedDocuments({domain:domain,origin:'shared'})
         });
         this.callObserver('onGlobalPercent', 0);
         if (shared) {
             this.callObserver('onDetailLabel',
                     ('recording shared documents : ' + shared.length));
-            var onedoc = null;
+            onedoc = null;
             for (j = 0; j < shared.length; j++) {
                 onedoc = shared.getDocument(j);
                 this.recordDocument({
@@ -871,9 +867,6 @@ offlineSynchronize.prototype.pullDocuments = function(config) {
         this.deleteDocuments({origin:'shared', domain:domain, deleteList:domain.sync().getSharedDocumentsToDelete()});
         
         this.callObserver('onGlobalPercent', 50);
-        // var dbcon=storageManager.getDbConnection();
-        // dbcon.executeSimpleSQL(docsDomainQuery);
-        // logConsole('docsDomain : '+docsDomainQuery);
         this.callObserver('onDetailLabel', domain.getTitle()
                 + ':get user documents');
         var userd = domain.sync().getUserDocuments({
@@ -897,28 +890,28 @@ offlineSynchronize.prototype.pullDocuments = function(config) {
             this.callObserver('onGlobalPercent', 90);
 
             this.retrieveReport({domain:domain});
-            /*
-             * storageManager .execQuery({ query : "insert into synchrotimes
-             * (initid, lastsyncremote, lastsynclocal, lastsavelocal) select initid ,
-             * :serverDate, :clientDate , :clientDate from documents", params : {
-             * clientDate : clientDate, serverDate : serverDate } });
-             */
-            this.recordFiles({domain:domain});
+            try {
+                this.recordFiles({domain:domain, userElement : true});
+            } catch(e) {
+                logDebug("error", e);
+            }
             this.deleteDocuments({origin:'user', domain:domain, deleteList:domain.sync().getUserDocumentsToDelete()});
             storageManager.lockDatabase({
                 lock : false
             });
-            // logConsole('synchrotimes : ', this.filesToDownload);
         } else {
             throw new SyncException("pull documents failed");
         }
         this.callObserver('onGlobalPercent', 100);
+        applicationEvent.publish("postPullUserDocument");
     } else {
         throw new ArgException("pullDocuments need domain parameter");
     }
 };
 offlineSynchronize.prototype.deleteDocuments = function(config) {
 
+    Components.utils.import("resource://modules/events.jsm");
+    var eventManager = applicationEvent;
     if (config && config.domain && config.origin && config.deleteList && (config.origin == 'user' || config.origin == 'shared')) {
 
         if (config.deleteList.length > 0) {
@@ -926,8 +919,7 @@ offlineSynchronize.prototype.deleteDocuments = function(config) {
             this.log("delete documents :"+sinitids);
             var callback={
                     handleCompletion : function() {
-
-                    logConsole("clean delete documents / 2" );
+                        logConsole("clean delete documents / 2" );
                         // clean database
                         storageManager.execQuery({
                             query :"delete from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"});
@@ -936,6 +928,7 @@ offlineSynchronize.prototype.deleteDocuments = function(config) {
                         if (config.onAfterUnlink) {
                             config.onAfterUnlink(config.deleteList);
                         }
+                        eventManager.publish("postPullUserDocument");
                     }
             };
 
@@ -963,6 +956,7 @@ offlineSynchronize.prototype.deleteDocuments = function(config) {
                      query :"delete from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"});
             storageManager.execQuery({
                      query :"delete from documents where initid not in (select initid from docsbydomain)"});
+            eventManager.publish("postPullUserDocument");
         }
 
     } else {
@@ -1314,7 +1308,7 @@ offlineSynchronize.prototype.pushDocuments = function(config) {
                                         lddoc.remove();
                                     }
                                 }
-                                logConsole('refresh;'+docid);
+                                logConsole('refresh : '+docid);
                                 // update local document
                                 me.revertDocument({
                                     domain : domain,
@@ -1330,8 +1324,6 @@ offlineSynchronize.prototype.pushDocuments = function(config) {
                             }
                             return false;
                         } else {
-                            //me.callObserver('onSuccess', me.synchroResults);
-                           
                             if (onComplete) {
                                 onComplete(); // pull documents
                             } else {

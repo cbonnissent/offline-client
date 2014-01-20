@@ -193,6 +193,8 @@ function initListeners() {
     applicationEvent.subscribe("postSynchronize", updateAbstractList);
     applicationEvent.subscribe("postSynchronize", reloadCreatableFamilies);
 
+    applicationEvent.subscribe("postPullUserDocument", updateAbstractList);
+
     applicationEvent.subscribe("simpleSynchronize", openSimpleSynchro);
 
     applicationEvent.subscribe("postUpdateFamilyList", setPrefCurrentSelectedFamily);

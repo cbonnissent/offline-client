@@ -9,21 +9,25 @@ window.onload = function() {
 };
 
 function displayError(error) {
-    Components.utils.import("resource://modules/StringBundle.jsm");
-    Components.utils.import("resource://modules/events.jsm");
-    var translate = new StringBundle("chrome://dcpoffline/locale/main.properties");
-    applicationEvent.unsubscribe("unableToSynchronize", displayError);
-    applicationEvent.unsubscribe("postSynchronize", displayEndOfSynchronize);
-    window.close();
-    Services.prompt.alert(null, translate.get("synchronize.unable"), error.reason);
+    if (window && window.close) {
+        window.close();
+        Services.prompt.alert(null, translate.get("synchronize.unable"), error.reason);
+    }
 }
 
 function displayEndOfSynchronize(result) {
-    Components.utils.import("resource://modules/events.jsm");
-    applicationEvent.unsubscribe("unableToSynchronize", displayError);
-    applicationEvent.unsubscribe("postSynchronize", displayEndOfSynchronize);
-    openDialog("chrome://dcpoffline/content/dialogs/endOfSynchronize.xul", "", "chrome,modal,close=false", result);
-    window.letClose();
+    if (window) {
+        if (window.openDialog) {
+            try {
+                window.openDialog("chrome://dcpoffline/content/dialogs/endOfSynchronize.xul", "", "chrome,modal,close=false", result);
+            } catch(e) {
+                
+            }
+        }
+        if (window.letClose) {
+            window.letClose();
+        }
+    }
 }
 
 function letSynchronize() {

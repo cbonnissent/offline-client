@@ -76,11 +76,11 @@ function displayError(error) {
 }
 
 function beginSynchronize() {
-    var arguments;
-    arguments = window.arguments[0];
-    if (arguments.method && arguments.options) {
+    var firstArgument;
+    firstArgument = window.firstArgument[0];
+    if (firstArgument.method && firstArgument.options) {
         try {
-            offlineSync[arguments.method](arguments.options);
+            offlineSync[firstArgument.method](firstArgument.options);
         } catch (error) {
             logConsole("error", error);
             displayError({reason : error.message});
