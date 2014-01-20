@@ -9,21 +9,21 @@ window.onload = function() {
 };
 
 function displayError(error) {
+    Components.utils.import("resource://modules/StringBundle.jsm");
+    Components.utils.import("resource://modules/events.jsm");
     var translate = new StringBundle("chrome://dcpoffline/locale/main.properties");
-    suppressListener();
+    applicationEvent.unsubscribe("unableToSynchronize", displayError);
+    applicationEvent.unsubscribe("postSynchronize", displayEndOfSynchronize);
     window.close();
     Services.prompt.alert(null, translate.get("synchronize.unable"), error.reason);
 }
 
 function displayEndOfSynchronize(result) {
-    suppressListener();
-    openDialog("chrome://dcpoffline/content/dialogs/endOfSynchronize.xul", "", "chrome,modal,close=false", result);
-    window.letClose();
-}
-
-function suppressListener() {
+    Components.utils.import("resource://modules/events.jsm");
     applicationEvent.unsubscribe("unableToSynchronize", displayError);
     applicationEvent.unsubscribe("postSynchronize", displayEndOfSynchronize);
+    openDialog("chrome://dcpoffline/content/dialogs/endOfSynchronize.xul", "", "chrome,modal,close=false", result);
+    window.letClose();
 }
 
 function letSynchronize() {
