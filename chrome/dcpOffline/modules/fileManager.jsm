@@ -151,7 +151,7 @@ var fileManager = {
                 }).getValue(config.attrid, config.index);
             }
             if (config.localIndex) {
-
+                logConsole("config.localIndex:",config.localIndex );
                 destDir.append(config.localIndex);
                 try {
                     destDir.remove(true);
