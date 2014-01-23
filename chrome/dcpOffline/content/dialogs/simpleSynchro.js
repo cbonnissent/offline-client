@@ -77,7 +77,7 @@ function displayError(error) {
 
 function beginSynchronize() {
     var firstArgument;
-    firstArgument = window.firstArgument[0];
+    firstArgument = window.arguments[0];
     if (firstArgument.method && firstArgument.options) {
         try {
             offlineSync[firstArgument.method](firstArgument.options);
