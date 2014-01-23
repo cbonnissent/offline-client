@@ -638,9 +638,9 @@ Fdl.OfflineSync.prototype = {
             }
             var url = this.context.url
                     + '?app=OFFLINE&action=OFF_DOMAINAPI&use=sync&method=pushFile&id='
-                    + this.domain.id + '&docid=' + config.documentId + '&aid='
-                    + config.attributeId + '&filename=' + file.leafName
-                    + '&transaction=' + this.transactionId;
+                    + encodeURIComponent(this.domain.id) + '&docid=' + encodeURIComponent(config.documentId) + '&aid='
+                    + encodeURIComponent(config.attributeId) + '&filename=' + encodeURIComponent(file.leafName)
+                    + '&transaction=' + encodeURIComponent(this.transactionId);
             var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
                     .createInstance(Components.interfaces.nsIFileInputStream);
             stream.init(file, 0x01 | 0x08, 0644, 0x04); // file is an nsIFile
