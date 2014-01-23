@@ -23,6 +23,10 @@
                 <label value="&synchro.progress;"/>
             </caption>
             <vbox>
+                <hbox>
+                    <label value="&synchro.currentActivity;"/>
+                    <label id="synchroActivity" />
+                </hbox>
                 <label value="&synchro.progress;"/>
                 <progressmeter id="progress" mode="determined" value="0" flex="1"/>
                 <label value="&synchro.progressGlobal;"/>

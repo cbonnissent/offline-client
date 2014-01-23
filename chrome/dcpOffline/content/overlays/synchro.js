@@ -43,6 +43,9 @@ function addObserver() {
         onDetailLabel : function(t) {
             appendText(t);
         },
+        onActivityLabel : function (t) {
+            updateActivity(t);
+        },
         onAddDocumentsToRecord : function(t) {
             myAddDocumentsToRecord(t);
         },
@@ -142,15 +145,15 @@ function tryToSynchronize() {
 function endSynchronize(result) {
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
-    applicationEvent.publish("postSynchronize", {result : true, description : result});
     document.getElementById("cancelButton").disabled = false;
+    applicationEvent.publish("postSynchronize", {result : true, description : result});
 }
 
 function errorOfSynchronize(result) {
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
-    applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
     document.getElementById("cancelButton").disabled = false;
+    applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
 }
 
 /*Close IHM*/
@@ -213,5 +216,17 @@ function myAddFilesSaved(delta) {
 }
 
 function appendText(text) {
-    document.getElementById('progressMessages').value += text + "\n";
+    var date = new Date(),
+        padding = function(value) {
+                if (value < 10) {
+                    value = "0"+value;
+                }
+            return value;
+        };
+    text = padding(date.getHours())+":"+ padding(date.getMinutes())+":"+padding(date.getSeconds())+" "+text;
+    document.getElementById('progressMessages').value = text + "\n" + document.getElementById('progressMessages').value;
+}
+
+function updateActivity(text) {
+    document.getElementById('synchroActivity').value = text;
 }
