@@ -143,16 +143,22 @@ function tryToSynchronize() {
 }
 
 function endSynchronize(result) {
+    var button = document.getElementById("cancelButton");
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
-    document.getElementById("cancelButton").disabled = false;
+    if (button) {
+        button.disabled = false;
+    }
     applicationEvent.publish("postSynchronize", {result : true, description : result});
 }
 
 function errorOfSynchronize(result) {
+    var button = document.getElementById("cancelButton");
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
-    document.getElementById("cancelButton").disabled = false;
+    if (button) {
+        button.disabled = false;
+    }
     applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
 }
 
