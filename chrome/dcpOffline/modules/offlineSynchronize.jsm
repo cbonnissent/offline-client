@@ -830,7 +830,7 @@ offlineSynchronize.prototype.updateEnumItems = function (config) {
 offlineSynchronize.prototype.deleteDocuments = function (config) {
 
     Components.utils.import("resource://modules/events.jsm");
-    var eventManager = applicationEvent;
+    var eventManager = applicationEvent, currentSync = this;
     if (config && config.domain && config.origin && config.deleteList && (config.origin == 'user' || config.origin == 'shared')) {
 
         if (config.deleteList.length > 0) {
@@ -849,6 +849,7 @@ offlineSynchronize.prototype.deleteDocuments = function (config) {
                     if (config.onAfterUnlink) {
                         config.onAfterUnlink(config.deleteList);
                     }
+                    currentSync.updateWorkTables();
                     eventManager.publish("postPullUserDocument");
                 }
             };
@@ -1503,6 +1504,10 @@ offlineSynchronize.prototype.updateWorkTables = function () {
     storageManager
         .execQuery({
             query : "insert into doctitles (famname, initid, title)  select fromname, initid, title from documents"
+        });
+    storageManager
+        .execQuery({
+            query : "delete FROM doctitles where initid not in (select initid from docsbydomain)"
         });
 };
 
