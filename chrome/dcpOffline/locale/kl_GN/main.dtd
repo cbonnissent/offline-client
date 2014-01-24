@@ -64,6 +64,7 @@
 <!ENTITY synchro.accessOnlineSpace              "synchro.accessOnlineSpace">
 <!ENTITY synchro.details.splitter.tooltiptext   "synchro.details.splitter.tooltiptext">
 <!ENTITY synchro.synchronizationInProgress      "synchro.synchronizationInProgress">
+<!ENTITY synchro.currentActivity                "synchro.currentActivity">
 
 <!-- preference -->
 <!ENTITY preference.dialogTitle                 "preference.dialogTitle">

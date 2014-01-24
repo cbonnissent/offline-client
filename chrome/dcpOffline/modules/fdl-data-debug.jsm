@@ -1620,7 +1620,6 @@ Fdl.Context.prototype.retrieveData = function(urldata, parameters,
 		                if (this.debug) r["evalDebugTime"]=(new Date().getTime())-db1;
 		                if (r.error) this.setErrorMessage(r.error);
 		                if (r.log) {
-		                    logConsole('datalog:',r.log);
 		                    delete r.log;
 		                }
 		                if (r.spentTime)

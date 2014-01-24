@@ -10,8 +10,9 @@ window.onload = function() {
 
 function displayError(error) {
     if (window && window.close) {
+        var translate = new StringBundle("chrome://dcpoffline/locale/main.properties");
+        window.alert(translate.get("synchronize.unable")+" "+error.reason);
         window.close();
-        Services.prompt.alert(null, translate.get("synchronize.unable"), error.reason);
     }
 }
 

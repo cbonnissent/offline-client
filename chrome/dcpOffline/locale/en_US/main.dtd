@@ -64,6 +64,7 @@
 <!ENTITY synchro.accessOnlineSpace              "Access online space">
 <!ENTITY synchro.details.splitter.tooltiptext   "Show/hide counters">
 <!ENTITY synchro.synchronizationInProgress      "Synchronization in progress">
+<!ENTITY synchro.currentActivity                "Task in progress : ">
 
 <!-- preference -->
 <!ENTITY preference.dialogTitle         "Preferences">

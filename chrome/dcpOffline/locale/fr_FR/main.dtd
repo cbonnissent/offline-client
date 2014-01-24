@@ -64,6 +64,7 @@
 <!ENTITY synchro.accessOnlineSpace              "Accéder à mon espace en ligne">
 <!ENTITY synchro.details.splitter.tooltiptext   "Afficher/masquer les compteurs de synchro">
 <!ENTITY synchro.synchronizationInProgress      "Synchronisation en cours">
+<!ENTITY synchro.currentActivity                "Tâche en cours : ">
 
 <!-- preference -->
 <!ENTITY preference.dialogTitle                 "Préférences">
