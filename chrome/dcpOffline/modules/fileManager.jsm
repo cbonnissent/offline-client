@@ -1,9 +1,7 @@
-const
-Cc = Components.classes;
-const
-Ci = Components.interfaces;
-const
-Cu = Components.utils;
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+const Cu = Components.utils;
+
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://modules/logger.jsm");
 Cu.import("resource://modules/storageManager.jsm");
@@ -11,24 +9,15 @@ Cu.import("resource://modules/utils.jsm");
 Cu.import("resource://modules/docManager.jsm");
 
 var EXPORTED_SYMBOLS = ["fileManager"];
-const
-STATE_START = Components.interfaces.nsIWebProgressListener.STATE_START;
-const
-STATE_STOP = Components.interfaces.nsIWebProgressListener.STATE_STOP;
-const
-PATH_FILES = "Files";
+const STATE_START = Components.interfaces.nsIWebProgressListener.STATE_START;
+const STATE_STOP = Components.interfaces.nsIWebProgressListener.STATE_STOP;
+const PATH_FILES = "Files";
+const PERMISSIONS_WRITABLE = 0660;
+const PERMISSIONS_NOT_WRITABLE = 0440;
 
-const
-PERMISSIONS_WRITABLE = 0660;
-const
-PERMISSIONS_NOT_WRITABLE = 0440;
-
-const
-TABLE_FILES = 'files';
-const
-STATUS_DONE = 1;
-const
-STATUS_UNDEF = -1;
+const TABLE_FILES = 'files';
+const STATUS_DONE = 1;
+const STATUS_UNDEF = -1;
 
 var filesRoot = Services.dirsvc.get("ProfD", Ci.nsILocalFile);
 filesRoot.append(PATH_FILES);
@@ -104,23 +93,19 @@ var fileManager = {
                             ? PERMISSIONS_WRITABLE
                             : PERMISSIONS_NOT_WRITABLE;
                     // set ref in database
-                    try {
-                        storeFile(config);
-                        if ((config.uuid) && (config.attrid != 'icon')) {
-                            var localDoc = docManager.getLocalDocument({
-                                initid : config.initid
+                    storeFile(config);
+                    if ((config.uuid) && (config.attrid != 'icon')) {
+                        var localDoc = docManager.getLocalDocument({
+                            initid : config.initid
+                        });
+                        if (localDoc) {
+                            localDoc.setValue(config.attrid, config.uuid,
+                                    index);
+                            localDoc.save({
+                                force : true,
+                                noModificationDate : true
                             });
-                            if (localDoc) {
-                                localDoc.setValue(config.attrid, config.uuid,
-                                        index);
-                                localDoc.save({
-                                    force : true,
-                                    noModificationDate : true
-                                });
-                            }
                         }
-                    } catch (e) {
-                        throw e;
                     }
                 }
             } catch (e) {
@@ -156,9 +141,7 @@ var fileManager = {
                 try {
                     destDir.remove(true);
                 } catch (e) {
-
                     dropFile(config);
-                    // logConsole("file delete:",destDir );
                 }
             }
 
@@ -169,7 +152,7 @@ var fileManager = {
 
     /**
      * return files modified
-     * @param int config.onlyDocument the idenificator of document to find modified files of this documents
+     * @param int config.onlyDocument the identificator of document to find modified files of this documents
      */
     getModifiedFiles : function(config) {
         if (config && config.domain) {
@@ -474,7 +457,6 @@ var fileManager = {
             initid : config.initid
         });
         if (localDocument) {
-
             var r = storageManager.execQuery({
                 query : "select * from files where initid=:initid",
                 params : {
@@ -509,7 +491,54 @@ var fileManager = {
                     });
                 }
             }
+        } else {
+            logError("Localdocument was not found "+JSON.stringify(config));
         }
+    },
+    /**
+     * Find all the files not associated to
+     */
+    deleteOrphanfiles : function() {
+        var result, i, destDir, currentFileManager = this, done = {};
+        result = storageManager.execQuery({
+            query : "SELECT * FROM files WHERE initid not in (select initid from docsbydomain)"
+        });
+        for (i in result) {
+            if (result.hasOwnProperty(i) && result[i].initid && result[i].attrid && result[i].index) {
+                currentFileManager.deleteFile({
+                    initid : result[i].initid,
+                    attrid : result[i].attrid,
+                    localIndex : result[i].index
+                });
+            }
+        }
+        for (i in result) {
+            if (result.hasOwnProperty(i) && result[i].initid && result[i].attrid) {
+                destDir = filesRoot.clone();
+                destDir.append(result[i].initid);
+                destDir.append(result[i].attrid);
+                try {
+                    destDir.remove(true);
+                } catch(e) {
+                    logError(e);
+                }
+            }
+        }
+        for (i in result) {
+            if (result.hasOwnProperty(i) && result[i].initid && !done[result[i].initid]) {
+                destDir = filesRoot.clone();
+                destDir.append(result[i].initid);
+                try {
+                    destDir.remove(true);
+                    done[result[i].initid] = true;
+                } catch (e) {
+                    logError(e);
+                }
+            }
+        }
+        storageManager.execQuery({
+            query : "DELETE FROM files WHERE initid not in (select initid from docsbydomain)"
+        });
     }
 };
 
@@ -592,33 +621,10 @@ function dropFile(config) {
                 });
     }
 };
-/*
- * function retrieveFile(config) { if (config && config.url) { if
- * (!config.aFile) { config.aFile = createTmpFile(); } // FIXME: download file
- * async // use addpending(config) before downloading // when download finishes //
- * use storeFile(config) to register file in database // then remove file from
- * pending downloads with removePending(config) return aFile; } else { throw
- * "missing parameters"; } }
- */
+
 function createTmpFile() {
     var aFile = Services.dirsvc.get("TmpD", Ci.nsILocalFile);
     aFile.append("suggestedName.tmp");
     aFile.createUnique(aFile.NORMAL_FILE_TYPE, 0666);
     return aFile;
 };
-/*
- * function addPending(config) { if (config && config.initid && config.attrid &&
- * config.index) { fileDwldProgress[initid] = fileDwldProgress[initid] || {};
- * fileDwldProgress[initid][attrid] = fileDwldProgress[initid][attrid] || {};
- * fileDwldProgress[initid][attrid][index] = STATUS_PENDING; } }
- * 
- * function removePending(config) { if (config && config.initid && config.attrid &&
- * config.index) { fileDwldProgress[initid] = fileDwldProgress[initid] || {};
- * fileDwldProgress[initid][attrid] = fileDwldProgress[initid][attrid] || {};
- * fileDwldProgress[initid][attrid][index] = STATUS_DONE; } }
- * 
- * function getPending(config) { if (config && config.initid && config.attrid &&
- * config.index) { if (fileDwldProgress[initid] &&
- * fileDwldProgress[initid][attrid]) { return
- * fileDwldProgress[initid][attrid][index]; } else { return STATUS_UNDEF; } } }
- */

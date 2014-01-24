@@ -79,13 +79,16 @@ offlineSynchronize.prototype.synchronizeDomain = function (config) {
                 currentSync.pullDocuments({
                     domain : domain,
                     onSuccess: function() {
-                        currentSync.callObserver('onGlobalPercent', 95);
-                        currentSync.updateWorkTables();
-                        currentSync.updateDomainSyncDate(config);
+                        currentSync.callObserver('onGlobalPercent', 90);
                         currentSync.callObserver("onActivityLabel", translate.get('synchronize.report'));
                         currentSync.retrieveReport({
                             domain : domain
                         });
+                        currentSync.callObserver('onGlobalPercent', 95);
+                        currentSync.callObserver("onActivityLabel", translate.get("synchronize.clean"));
+                        currentSync.updateWorkTables();
+                        currentSync.updateDomainSyncDate(config);
+                        fileManager.deleteOrphanfiles();
                         currentSync.callObserver('onGlobalPercent', 100);
                         if (currentSync.synchroResults) {
                             if (currentSync.synchroResults.status != "successTransaction") {
