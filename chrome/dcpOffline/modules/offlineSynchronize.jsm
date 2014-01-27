@@ -1508,10 +1508,6 @@ offlineSynchronize.prototype.updateWorkTables = function () {
         .execQuery({
             query : "insert into doctitles (famname, initid, title)  select fromname, initid, title from documents"
         });
-    storageManager
-        .execQuery({
-            query : "delete FROM doctitles where initid not in (select initid from docsbydomain)"
-        });
 };
 
 /**
