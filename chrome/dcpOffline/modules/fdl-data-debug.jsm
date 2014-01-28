@@ -2494,8 +2494,10 @@ Fdl.Document.prototype = {
 		u=u.substring(0,ps+1);
 		src=u+this._data.properties.icon;
 	    }
-	    src=u+'resizeimg.php?size='+width+'&img='+escape(src);
-	}
+	    src=u+'resizeimg.php?size='+width+'&img='+encodeURIComponent(this._data.properties.icon);
+	} else {
+        src=this.context.url+this._data.properties.icon;
+    }
 	return src;
     },	
     /**
