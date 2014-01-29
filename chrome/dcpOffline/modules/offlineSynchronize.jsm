@@ -639,7 +639,7 @@ offlineSynchronize.prototype.recordDocument = function recordDocument(config) {
                         if (domainFolders.indexOf('offshared_' + domainRef) >= 0) {
                             isShared = true;
                         }
-                        if (domainFolders.indexOf('offuser_' + domainRef + '_' + me.getLogin()) >= 0) {
+                        if (domainFolders.indexOf('offuser_' + domainRef + '_' + me.getUserId()) >= 0) {
                             isUsered = true;
                         }
                         storageManager
@@ -1568,6 +1568,14 @@ offlineSynchronize.prototype.getLogin = function () {
         this._login = authentificator.currentLogin;
     }
     return this._login;
+}
+/**
+ * Get user Id
+ *
+ * @return int
+ */
+offlineSynchronize.prototype.getUserId = function () {
+    return Preferences.get("offline.user.id");
 }
 
 /**
