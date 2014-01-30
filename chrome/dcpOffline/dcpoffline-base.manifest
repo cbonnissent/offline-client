@@ -1,6 +1,9 @@
 ## main content
 content dcpoffline content/
 
+component {9a327740-8732-11e3-baa7-0800200c9a66} components/docid_autocomplete.js
+contract @mozilla.org/autocomplete/search;1?name=docid-autocomplete {9a327740-8732-11e3-baa7-0800200c9a66}
+
 ## JS modules
 resource    modules                         modules/
 

@@ -22,229 +22,63 @@
                 class="dcpAttribute docid">
 
                 <xul:dcpAttributeLabel
-                    anonid="attrLabel"
+                    anonid="value"
                     xbl:inherits="mode,required,value=label" />
-                <xul:menulist
-                    xbl:inherits="disabled"
-                    editable="false"
-                    disableautoselect="true"
-                    sizetopopup = "none"
-                    anonid="displayValue"
-                    class="dcpValue">
-                    <xul:menupopup
-                        anonid="queryList"
-                        datasources="profile:storage.sqlite"
-                        ref="*"
-                        querytype="storage">
-                        <xul:menuitem
-                            anonid="choose"
-                            value=""
-                            class="dcpChooseDocid"
-                            label="&attribute.docid.noDocumentSet;" />
-                    </xul:menupopup>
-                </xul:menulist>
+                <xul:textbox anonid="displayValue"
+                         type="autocomplete"
+                         autocompletesearch="docid-autocomplete"
+                         xbl:inherits="autocompletesearchparam=relationFamily,disabled"/>
             </xul:hbox>
         </content>
 
         <implementation>
-
-            <constructor><![CDATA[
-                    var ml=this.getChild('choose');
-                    if (ml) {
-                        var relFamId=this.getAttribute('relationFamily');
-                        if (relFamId) {
-                            /*
-                            var fTitle=docManager.getFamilyTitle({name:relFamId});
-                            if (fTitle && fTitle != 'no family title') {
-                                var translate = new StringBundle(
-                                        "chrome://dcpoffline/locale/bindings/leaf-attributes-binding.properties");
-                                var message = translate.get('attr.docid.choose', [fTitle]);
-                                ml.setAttribute('label', message);
-                            }
-                */
-                        }
-                    }
-            ]]></constructor>
             <field name="inputField"><![CDATA[
                 this.getChild('displayValue');
             ]]></field>
 
             <property
-                name="queryTemplate"
-                readonly="true">
-                <getter><![CDATA[
-                    var query = this.queryQuery;
-                    var params = this.queryParams;
-                    var action = this.queryAction;
-                    
-                    var template = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "template");
-                    
-                    query.appendChild(params);
-                    
-                    template.appendChild(query);
-                    
-                    template.appendChild(action);
-                    
-                    return template;
-                ]]></getter>
+                    name="bindingValue"
+                    readonly="true"
+                    onget="return this.inputField.initid">
             </property>
-
-            <property
-                name="queryQuery"
-                readonly="true">
-                <getter><![CDATA[
-                    var query = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "query");
-                    query.textContent = "SELECT initid, title"
-                            + " FROM doctitles"
-                            + " WHERE famname = :famid and initid like :filterid order by title";
-                    return query;
-                ]]></getter>
-            </property>
-
-            <property
-                name="queryParams"
-                readonly="true">
-                <getter><![CDATA[
-                    var paramsFragment = document.createDocumentFragment();
-                    var params = this.queryParamsList;
-                    params.forEach(function(paramId){
-                        var param = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "param");
-                        param.setAttribute('anonid', paramId);
-                        param.setAttribute('name', paramId);
-                        paramsFragment.appendChild(param);
-                    });
-                    return paramsFragment;
-                ]]></getter>
-            </property>
-
-            <property
-                name="queryParamsList"
-                readonly="true">
-                <getter><![CDATA[
-                    return ['famid', 'filterid'];
-                ]]></getter>
-            </property>
-
-            <property
-                name="queryAction"
-                readonly="true">
-                <getter><![CDATA[
-                    var action = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "action");
-                    
-                    var menuItem = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menuitem");
-                    menuItem.setAttribute('uri', '?');
-                    menuItem.setAttribute('value', '?initid');
-                    menuItem.setAttribute('label', '?title');
-                    
-                    action.appendChild(menuItem);
-                    
-                    return action;
-                ]]></getter>
-            </property>
-
-            <method name="fillParameters">
-                <parameter name="value" />
-                <body><![CDATA[
-                    var needRebuild = false;
-                    if( (value === undefined) || (value === null) ){
-                        needRebuild = true;
-                        value = '%';
-                    }
-                    var relationFamily = this.getAttribute('relationFamily');
-                    var famidParam = this.getChild('famid');
-                    var filteridParam = this.getChild('filterid');
-                    
-                    if( famidParam.textContent != relationFamily ){
-                        famidParam.textContent = relationFamily;
-                        needRebuild = true;
-                    }
-                    
-                    if( filteridParam.textContent != value ){
-                        filteridParam.textContent = value;
-                        needRebuild = true;
-                    }
-                    return needRebuild;
-                ]]></body>
-            </method>
 
             <method name="reloadValue">
                 <body><![CDATA[
-                    if( !this.constructed ){
-                        this.getChild('queryList').appendChild(this.queryTemplate);
-                        this.constructed = true;
-                    }
-                    
-                    var value = this.getDocId() || this.getValue();
-                    
-                    if( this.fillParameters(value) ){
-                        this.getChild('displayValue').menupopup.builder.rebuild();
-                    }
-                    
-                    var menuList = this.getChild('displayValue');
-                    var nbItems = menuList.itemCount;
-                    for(var i = 0; i < nbItems; i++) {
-                        var item = menuList.getItemAtIndex(i);
-                        if( (item.localName == 'menuitem') && (item.value == value) ){
-                            menuList.selectedIndex = i;
-                            break;
-                        }
-                    }
-                    var icon=null;
-                    
-                    if(value && !Array.isArray(value)){
-                        var sdoc=docManager.getLocalDocument({initid:value});
-                        if (! sdoc) sdoc=docManager.getLocalDocument({name:this.getAttribute('relationFamily')});
-                        if (sdoc) {
-                            icon=sdoc.getIcon();
-                        }
-                        if (icon) {
-                            menuList.image='file://'+icon;
-                        }
-                    }
-                ]]></body>
-            </method>
+                        Components.utils.import("resource://modules/storageManager.jsm");
+                        var valueNode = this.getChild('displayValue'), result = [], title = "", initid;
 
-            <method name="unSelect">
-                <body><![CDATA[
-                    var menuList = this.getChild('displayValue');
-                    menuList.selectedIndex=0;
-                ]]></body>
-            </method>
-
-            <method name="getDocId">
-                <body><![CDATA[
-                    var menuList = this.getChild('displayValue');
-                    return menuList.value;
-                ]]></body>
-            </method>
-
-            <method name="getDocTitle">
-                <body><![CDATA[
-                    var menuList = this.getChild('displayValue');
-                    return menuList.label;
-                ]]></body>
+                        if (valueNode) {
+                            initid = this.getValue();
+                            if (initid) {
+                                title = "no title:";
+                                result = storageManager
+                                        .execQuery({
+                                            query :  "select title from doctitles where initid = :initid",
+                                            params : {
+                                                initid : initid
+                                            }
+                                        });
+                                valueNode.initid = initid;
+                                title += initid;
+                            }
+                            if (result.length > 0) {
+                                title = result[0].title || title;
+                            }
+                            valueNode.value = title;
+                        } else {
+                            Components.utils.import("resource://modules/exceptions.jsm");
+                            throw BindException("no displayValue child for attr [" + this.attrid + "] in doc [" + this.doc.getInitid() + "]");
+                        }
+                    ]]></body>
             </method>
 
         </implementation>
 
         <handlers>
-            <handler event="command"><![CDATA[
-                if (this.getAttribute("noset") != "true") {
-                    this.setValue(this.getDocId());
-                } else {
-                    this.reloadValue();
-                }
+            <handler event="textentered"><![CDATA[
+                alert("toto");
             ]]></handler>
 
-            <handler event="popupshowing"><![CDATA[
-                if( !this.constructed ){
-                    this.getChild('queryList').appendChild(this.queryTemplate);
-                    this.constructed = true;
-                }
-                    
-                this.fillParameters();
-                this.getChild('displayValue').menupopup.builder.rebuild();
-            ]]></handler>
         </handlers>
 
     </binding>
