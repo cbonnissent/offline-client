@@ -433,7 +433,7 @@ var fileManager = {
             const
             flags = nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
             persist.persistFlags = flags;
-            persist.saveURI(obj_URI, null, null, null, "", file.aFile);
+            persist.saveURI(obj_URI, null, null, null, "", file.aFile, null);
         }
     },
     updateFileSyncDate : function(config) {
