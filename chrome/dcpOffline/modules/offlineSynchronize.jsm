@@ -89,6 +89,7 @@ offlineSynchronize.prototype.synchronizeDomain = function (config) {
                         currentSync.updateWorkTables();
                         currentSync.updateDomainSyncDate(config);
                         fileManager.deleteOrphanfiles();
+                        fileManager.cleanUselessFiles();
                         currentSync.callObserver('onGlobalPercent', 100);
                         if (currentSync.synchroResults) {
                             if (currentSync.synchroResults.status != "successTransaction") {
@@ -1151,7 +1152,7 @@ offlineSynchronize.prototype.pendingFiles = function (config) {
  * @return void
  */
 offlineSynchronize.prototype.recordFiles = function recordFiles(config, filesList) {
-    var me = this, filesToDl = filesList, afterCallBack = function () {
+    var me = this, filesToDl = filesList, filesDone = 0, afterCallBack = function () {
         if (config.onSuccess) {
             config.onSuccess();
         }
@@ -1171,13 +1172,11 @@ offlineSynchronize.prototype.recordFiles = function recordFiles(config, filesLis
             var filesLength = filesToDl.length;
             fileManager.downloadFiles({
                 files :                filesToDl,
-                acquitFileCallback :   function (fileManager) {
+                acquitFileCallback :   function (fileManager, file) {
                     me.callObserver('onAddFilesRecorded', 1);
-                    if (fileManager.filesToDownLoad && fileManager.filesToDownLoad.length > 0) {
-                        me.callObserver("onDetailLabel", 'Element downloaded : '+(fileManager.filesToDownLoad[0].basename || ""));
-                    }
-                    // me.callObserver('onDetailLabel',fm.filesToDownLoad.length+'/'+filesLength);
-                    me.callObserver('onDetailPercent', (filesLength - fileManager.filesToDownLoad.length) / filesLength * 100);
+                    filesDone += 1;
+                    me.callObserver("onDetailLabel", 'Element downloaded : '+(file.basename || ""));
+                    me.callObserver('onDetailPercent', filesDone / filesLength * 100);
                 },
                 completeFileCallback : function () {
                     me.log('all files recorded');
