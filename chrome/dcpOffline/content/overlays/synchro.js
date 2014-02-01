@@ -92,6 +92,7 @@ function initPage() {
 
 function initListeners() {
     applicationEvent.subscribe("synchronize", synchronize, {onError : errorOfSynchronize});
+    applicationEvent.subscribe("preSynchronize", verifySynchroState);
     applicationEvent.subscribe("changeSelectedDomain", updateDomain);
     window.addEventListener("close", canBeClosed, false);
 }
@@ -105,6 +106,7 @@ function synchronize() {
         });
         document.getElementById('progress').mode = 'undetermined';
         try {
+            window.synchroInProgress = true;
             offlineSync.synchronizeDomain({
                 domain : domain
             });
@@ -115,6 +117,10 @@ function synchronize() {
         applicationEvent.publish("unableToSynchronize",{reason : translate.get("synchronize.noDomainSelected")});
         return false;
     }
+}
+
+function verifySynchroState() {
+    return !window.synchroInProgress;
 }
 
 function updateDomain(config) {
@@ -130,16 +136,9 @@ function updateDomain(config) {
 
 function tryToSynchronize() {
     if (!applicationEvent.publish("preSynchronize")) {
-        // TODO add alert message
-        alert("unable to synchronize");
-    } else {
-        if (applicationEvent.publish("synchronize")) {
-            
-        } else {
-            //TODO add log
-        }
+        return;
     }
-    
+    applicationEvent.publish("synchronize");
 }
 
 function endSynchronize(result) {
@@ -149,6 +148,7 @@ function endSynchronize(result) {
     if (button) {
         button.disabled = false;
     }
+    window.synchroInProgress = false;
     applicationEvent.publish("postSynchronize", {result : true, description : result});
 }
 
@@ -159,6 +159,7 @@ function errorOfSynchronize(result) {
     if (button) {
         button.disabled = false;
     }
+    window.synchroInProgress = false;
     applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
 }
 
