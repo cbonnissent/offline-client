@@ -47,10 +47,12 @@ pref("general.useragent.locale", "fr");
 /*
 pref("offline.application.debug.locale", "kl_GN");
 pref("general.useragent.locale", "kl_GN");
-
+*/
+/*
 pref("browser.dom.window.dump.enabled", true);
 pref("javascript.options.showInConsole", true);
 pref("nglayout.debug.disable_xul_cache", true);
 pref("nglayout.debug.disable_xul_fastload", true);
 pref("dom.report_all_js_exceptions", true);
+pref("devtools.debugger.remote-enabled", true);
 */

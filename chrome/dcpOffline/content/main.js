@@ -14,6 +14,13 @@ Cu.import("resource://modules/StringBundle.jsm");
 Cu.import("resource://modules/fileManager.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
+Cu.import('resource://gre/modules/devtools/dbg-server.jsm');
+if (!DebuggerServer.initialized) {
+    DebuggerServer.init();
+    DebuggerServer.addBrowserActors();
+}
+DebuggerServer.openListener(6000);
+
 /* init elements */
 /* Add window binding onLoad and onClose */
 window.onload = function() {
