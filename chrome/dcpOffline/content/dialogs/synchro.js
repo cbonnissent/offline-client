@@ -3,15 +3,13 @@ Components.utils.import("resource://modules/StringBundle.jsm");
 Components.utils.import("resource://modules/events.jsm");
 
 window.onload = function() {
-    applicationEvent.subscribe("unableToSynchronize", displayError);
+    applicationEvent.subscribe("unableToSynchronize", closeWindow);
     applicationEvent.subscribe("postSynchronize", displayEndOfSynchronize);
     initSynchronize();
 };
 
-function displayError(error) {
+function closeWindow() {
     if (window && window.close) {
-        var translate = new StringBundle("chrome://dcpoffline/locale/main.properties");
-        window.alert(translate.get("synchronize.unable")+" "+error.reason);
         window.close();
     }
 }
@@ -22,7 +20,7 @@ function displayEndOfSynchronize(result) {
             try {
                 window.openDialog("chrome://dcpoffline/content/dialogs/endOfSynchronize.xul", "", "chrome,modal,close=false", result);
             } catch(e) {
-                
+                logDebug(e);
             }
         }
         if (window.letClose) {

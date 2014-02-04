@@ -1522,124 +1522,142 @@ Fdl.Context.prototype.resizeImage = function(icon, width) {
  * @param String otherroot to call another file in same domain (it is forbidden to call another server domain)
  * @return Boolean true if ok
  */
-Fdl.Context.prototype.retrieveData = function(urldata, parameters,
-		anonymousmode, otherroot) {
-	var bsend = '';
-	var ANAKEENBOUNDARY = '--------Anakeen www.anakeen.com 2009';
-	var xreq=null;
-	if (typeof window != 'undefined') {
-		if (window.XMLHttpRequest) {
-			xreq = new XMLHttpRequest();
-		} else if (window.ActiveXObject) {
-			// branch for IE/Windows ActiveX version
-			xreq = new ActiveXObject("Microsoft.XMLHTTP");
-		}
-	} else {
-		xreq = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
-	}
-	var sync = true;
+Fdl.Context.prototype.retrieveData = function (urldata, parameters, anonymousmode, otherroot) {
+    var bsend = '';
+    var ANAKEENBOUNDARY = '--------Anakeen www.anakeen.com 2009';
+    var xreq = null;
+    if (typeof window != 'undefined') {
+        if (window.XMLHttpRequest) {
+            xreq = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            // branch for IE/Windows ActiveX version
+            xreq = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    } else {
+        xreq = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
+    }
+    var sync = true;
 
-	if (xreq) {
-	    if (parameters && parameters.onComplete) {
-	        sync=false;
-	        xreq.onreadystatechange=function () {
-	            if (xreq.readyState == 4) {
-	                if (xreq.status == 200) {
-	                    parameters.onComplete(xreq);
-	                } else {
-	                    if (parameters.onError) {
-	                        parameters.onError(xreq);
-	                    }
-	                }
-	            }
+    if (xreq) {
+        if (parameters && parameters.onComplete) {
+            sync = false;
+            xreq.onreadystatechange = function () {
+                if (xreq.readyState == 4) {
+                    if (xreq.status == 200) {
+                        parameters.onComplete(xreq);
+                    } else {
+                        if (parameters.onError) {
+                            parameters.onError(xreq);
+                        }
+                    }
+                }
 
-	        }
-	    }
-		var url = this.url;
-		if (!url)
-			url = '/';
-		if (otherroot)
-			url += otherroot;
-		else if (anonymousmode)
-			url += 'guest.php';
-		else
-			url += 'data.php';
-		// url+='?';
-		var method = "POST";
-		if( (!urldata) && (!parameters) && otherroot ) {
-			method = "GET";
-		}
-		xreq.open(method, url, (!sync));
-		if (method) {
-			var name=null;
-			xreq.setRequestHeader("Content-Type",
-							"multipart/form-data; boundary=\""
-									+ ANAKEENBOUNDARY + "\"");
-			for (name in urldata) {
-				bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
-				bsend += "Content-Disposition: form-data; name=\"" + name
-						+ "\"\r\n\r\n";
-				bsend += urldata[name];
-			}
-			if (parameters) {
-				for (name in parameters) {
-					if (name != 'context') {
-						bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
-						bsend += "Content-Disposition: form-data; name=\"" + name
-						+ "\"\r\n\r\n";
-						if (typeof parameters[name]=='object') {
-							try {
+            }
+        }
+        var url = this.url;
+        if (!url) {
+            url = '/';
+        }
+        if (otherroot){
+            url += otherroot;
+        }
+        else if (anonymousmode) {
+            url += 'guest.php';
+        }
+        else {
+            url += 'data.php';
+        }
+        var method = "POST";
+        if ((!urldata) && (!parameters) && otherroot) {
+            method = "GET";
+        }
+        xreq.open(method, url, (!sync));
+        if (method) {
+            var name = null;
 
-								bsend += JSON.stringify(parameters[name]);
-							} catch (e){
-								bsend += parameters[name];
-							}
-						} else bsend += parameters[name];
-					}
-				}
-			}
-		}
-		applicationEvent.publish("startMonitorXHR", {XHR : xreq});
-		try {
-		    if (bsend.length == 0)
-		        xreq.send('');
-		    else
-		        xreq.send(bsend);
-		} catch (e) {
-		    this.setErrorMessage('HTTP status: unable to send request');
-		}
-		applicationEvent.publish("stopMonitorXHR", {XHR : xreq});
-		if (sync) {
-		    if (xreq.status == 200) {
-		        var r = false;
-		        try {
-		            var db1=new Date().getTime();
-		            if (parameters && parameters.plainfile) {
-		                r =  xreq.responseText;
-		            } else {
-		                r = eval('(' + xreq.responseText + ')');
-		                if (this.debug) r["evalDebugTime"]=(new Date().getTime())-db1;
-		                if (r.error) this.setErrorMessage(r.error);
-		                if (r.log) {
-		                    delete r.log;
-		                }
-		                if (r.spentTime)
-		                    logConsole( {
-		                        time : r.spentTime
-		                    });
-		                delete r.spentTime;
-		            }
-		        } catch (ex) {
-		            throw('error on serveur data:'+xreq.responseText);
-		        }
-		        return r;
-		    } else {
-		        if (xreq)
-		            this.setErrorMessage('HTTP status:' + xreq.status);
-		    }
-		}
-	}
-	return false;
+            xreq.setRequestHeader("Content-Type",
+                "multipart/form-data; boundary=\""
+                    + ANAKEENBOUNDARY + "\"");
+            for (name in urldata) {
+                if (!urldata.hasOwnProperty(name)) {
+                    continue;
+                }
+                bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
+                bsend += "Content-Disposition: form-data; name=\"" + name
+                    + "\"\r\n\r\n";
+                bsend += urldata[name];
+            }
+            if (parameters) {
+                for (name in parameters) {
+                    if (!parameters.hasOwnProperty(name)) {
+                        continue;
+                    }
+                    if (name != 'context') {
+                        bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
+                        bsend += "Content-Disposition: form-data; name=\"" + name
+                            + "\"\r\n\r\n";
+                        if (typeof parameters[name] == 'object') {
+                            try {
+
+                                bsend += JSON.stringify(parameters[name]);
+                            } catch (e) {
+                                bsend += parameters[name];
+                            }
+                        } else bsend += parameters[name];
+                    }
+                }
+            }
+        }
+        applicationEvent.publish("startMonitorXHR", {XHR : xreq});
+        try {
+            if (bsend.length == 0) {
+                xreq.send('');
+            }
+            else {
+                xreq.send(bsend);
+            }
+        } catch (e) {
+            this.setErrorMessage('HTTP status: unable to send request');
+        }
+        applicationEvent.publish("stopMonitorXHR", {XHR : xreq});
+        if (sync) {
+            if (xreq.status == 200) {
+                var result = false;
+                try {
+                    var db1 = new Date().getTime();
+                    if (parameters && parameters.plainfile) {
+                        result = xreq.responseText;
+                    } else {
+                        result = JSON.parse(xreq.responseText);
+                        if (this.debug) {
+                            result["evalDebugTime"] = (new Date().getTime()) - db1;
+                        }
+                        if (result.error) {
+                            this.setErrorMessage(result.error);
+                        }
+                        if (result.log) {
+                            delete result.log;
+                        }
+                        if (result.spentTime) {
+                            logConsole({
+                                time : result.spentTime
+                            });
+                        }
+                        delete result.spentTime;
+                    }
+                } catch (ex) {
+                    throw('error on serveur data:' + xreq.responseText);
+                }
+                return result;
+            } else {
+                if (xreq) {
+                    this.setErrorMessage('HTTP status:' + xreq.status);
+                    throw "URL : "+url+"\n Param :"+JSON.stringify(parameters)+"\n HTTP status:" + xreq.status+"\n xreq content :"+ xreq.responseText;
+                }
+            }
+        }
+    }
+    return false;
 };
 
 /**

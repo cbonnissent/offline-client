@@ -94,6 +94,7 @@ function initListeners() {
     applicationEvent.subscribe("synchronize", synchronize, {onError : errorOfSynchronize});
     applicationEvent.subscribe("preSynchronize", verifySynchroState);
     applicationEvent.subscribe("changeSelectedDomain", updateDomain);
+    applicationEvent.subscribe("unableToSynchronize", errorOfSynchronize);
     window.addEventListener("close", canBeClosed, false);
 }
 
@@ -111,6 +112,7 @@ function synchronize() {
                 domain : domain
             });
         } catch(exception) {
+            logDebug(exception);
             applicationEvent.publish("unableToSynchronize",{reason : exception});
         }
     } else {
@@ -153,12 +155,18 @@ function endSynchronize(result) {
 }
 
 function errorOfSynchronize(result) {
-    var button = document.getElementById("cancelButton");
+    var message = "", button = document.getElementById("cancelButton"), translate;
     document.getElementById('progress').value = 100;
     document.getElementById('progress').mode = 'determined';
     if (button) {
         button.disabled = false;
     }
+    if (result && result.reason) {
+        message = result.reason.message || result.reason;
+    }
+    translate = new StringBundle("chrome://dcpoffline/locale/main.properties");
+    logConsole("Unable to synchronize ", result);
+    window.alert(translate.get("synchronize.unable") + " : " + message);
     window.synchroInProgress = false;
     applicationEvent.publish("postSynchronize", {description : {status : false, message : result}});
 }
