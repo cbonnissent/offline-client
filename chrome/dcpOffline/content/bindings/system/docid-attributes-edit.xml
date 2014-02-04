@@ -248,31 +248,33 @@
                 <xul:dcpAttributeLabel
                         anonid="attrLabel"
                         xbl:inherits="value=label"/>
-                <xul:hbox>
-                    <xul:vbox>
-                        <xul:listbox
-                                xbl:inherits="disabled"
-                                anonid="multiBox"
-                                flex="1"
-                                seltype="multiple">
-                        </xul:listbox>
+                <xul:vbox>
+                    <xul:listbox
+                            xbl:inherits="disabled"
+                            anonid="multiBox"
+                            seltype="multiple">
+                    </xul:listbox>
+                    <xul:hbox>
                         <xul:dcpAttribute
                                 anonid="selector"
-                                xbl:inherits="attrid,label,relationFamily,visibility,type,disabled"
+                                xbl:inherits="label,relationFamily,visibility,type,disabled"
                                 nolabel="true"
                                 noset="true"
                                 multiple="false"/>
-                    </xul:vbox>
-                    <xul:button
-                            anonid="clearSelection"
-                            disabled="true"
-                            label="Clear selection"/>
-                </xul:hbox>
+                        <xul:button
+                                anonid="clearSelection"
+                                disabled="true"
+                                label="&attribute.docid.multiple.button.clear.selection;"/>
+                    </xul:hbox>
+                </xul:vbox>
             </xul:hbox>
         </content>
         <implementation>
+            <field name="inputField"><![CDATA[
+                this.getChild('multiBox');
+                ]]></field>
             <field name="selector"><![CDATA[
-                this.getChild('displayValue');
+                this.getChild('selector');
                 ]]></field>
             <field name="clearSelection"><![CDATA[
                 this.getChild('clearSelection');
@@ -280,6 +282,11 @@
             <field name="multiBox"><![CDATA[
                 this.getChild('multiBox');
                 ]]></field>
+            <property
+                    name="bindingValue"
+                    readonly="true"
+                    onget="return this.getValues();">
+            </property>
             <method name="reloadValue">
                 <body><![CDATA[
                         Components.utils.import("resource://modules/formater.jsm");
@@ -339,11 +346,7 @@
             <handler event="select"><![CDATA[
                     if (event.originalTarget == this.multiBox) {
                         var nbRows = this.multiBox.selectedCount;
-                        if (nbRows > 0) {
-                            this.clearSelection.disabled = false;
-                        } else {
-                            this.clearSelection.disabled = true;
-                        }
+                        this.clearSelection.disabled = false;
                     }
                 ]]></handler>
             <handler event="command"><![CDATA[
@@ -368,6 +371,7 @@
                             values.push(newDocumentId);
 
                             this.setValue(values);
+                            this.selector.inputField.value = "";
                         }
                     }
                 ]]></handler>

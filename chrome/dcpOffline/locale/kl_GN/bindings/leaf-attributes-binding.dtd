@@ -3,5 +3,6 @@
 <!ENTITY  attribute.image.button.modify                     "attribute.image.button.modify">
 <!ENTITY  attribute.image.button.delete                     "attribute.image.button.delete">
 <!ENTITY  attribute.enum.multiple.button.clear.selection    "attribute.enum.multiple.button.clear.selection">
+<!ENTITY  attribute.docid.multiple.button.clear.selection   "attribute.docid.multiple.button.clear.selection">
 
 <!ENTITY  attribute.docid.noDocumentSet                     "attribute.docid.noDocumentSet">
