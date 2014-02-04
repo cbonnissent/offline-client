@@ -212,7 +212,9 @@ dcpAttribute[type=enum] grid .dcpSeparator,
 dcpAttribute[type=array] grid .dcpLabel,
 dcpAttribute[type=array] grid .dcpSeparator,
 dcpAttribute[type=docid] grid .dcpLabel,
-dcpAttribute[type=docid] grid .dcpSeparator {
+dcpAttribute[type=docid] grid .dcpSeparator,
+dcpAttribute[type=account] grid .dcpLabel,
+dcpAttribute[type=account] grid .dcpSeparator {
     visibility: collapse;
 }
 

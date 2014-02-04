@@ -724,7 +724,7 @@ offlineSynchronize.prototype.updateTitles = function (config) {
     if (config && config.document) {
         var oas = config.document.getAttributes();
         for (var aid in oas) {
-            if (oas[aid].type == 'docid') {
+            if (oas[aid].type == 'docid' || oas[aid].type == 'account') {
                 var values = config.document.getValue(aid);
                 var titles = config.document.getDisplayValue(aid);
                 if (!Array.isArray(values)) {

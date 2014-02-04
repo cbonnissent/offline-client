@@ -625,6 +625,7 @@ var storageManager = {
                                     case 'file' :
                                     case 'enum' :
                                     case 'thesaurus' :
+                                    case 'account' :
                                     case 'docid' :
                                     case 'timestamp' :
                                     case 'date' :
