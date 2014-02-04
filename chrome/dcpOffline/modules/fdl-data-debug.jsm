@@ -166,6 +166,7 @@ Components.utils.import("resource://modules/events.jsm");
 
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
+var JSON;
 
 if (!this.JSON) {
     JSON = {};
@@ -559,7 +560,7 @@ Fdl.print_r = function(obj, maxlevel) {
 };
 /**
  * to record url to access to freedom server
- * 
+ *
  * @hide
  * @deprecated
  */
@@ -694,7 +695,7 @@ Fdl.getLastErrorMessage = function() {
 Fdl.retrieveData = function(urldata, parameters, anonymousmode) {
 	var bsend = '';
 	var ANAKEENBOUNDARY = '--------Anakeen www.anakeen.com 2009';
-	
+
 	/*
 	 * if ((!anonymousmode) && ! Fdl.isAuthenticated()) { throw('not
 	 * authenticate'); return null; }
@@ -880,7 +881,7 @@ Fdl.getTime = function() {
 };
 /**
  * JSON to XML
- * 
+ *
  * @param {Object}
  *            JSON
  * @return string the xml string
@@ -966,7 +967,7 @@ Fdl.json2xml = function(json, node, childs) {
 
 /**
  * Convert TEXT to XML DOM document Object
- * 
+ *
  * @param {string}
  *            strXML the xml string
  * @return {Object} XML DOM Document
@@ -993,7 +994,7 @@ Fdl.text2xml = function(strXML) {
 };
 /**
  * Convert XML to JSON Object
- * 
+ *
  * @param {Object}
  *            XML DOM Document
  */
@@ -1078,7 +1079,7 @@ Fdl.encodeHtmlTags= function(v) {
     }
     return v;
 };
-	
+
 // ---------------------
 // Not prototype
 // @deprecated
@@ -1118,22 +1119,22 @@ Fdl.createDocument = function(config) {
 /**
  * @class Fdl.Context The connection context object to access to freedom
  *        documents
- * 
+ *
  * <pre><code>
   var C=new Fdl.Context({url:'http://my.freedom/'});
-  if (! C.isConnected()) {   
+  if (! C.isConnected()) {
     throw('error connect:'+C.getLastErrorMessage());
     return;
   }
-  
+
   if (! C.isAuthenticated()) {
     var u=C.setAuthentification({login:'admin',password:'anakeen'});
-    if (!u)  throw('error authent:'+C.getLastErrorMessage());    
+    if (!u)  throw('error authent:'+C.getLastErrorMessage());
   }
   &lt;core&gt;
  * </pre>
  * @param {Object} config
- * @cfg {String} url the url to reach freedom server 
+ * @cfg {String} url the url to reach freedom server
  * @constructor
  */
 Fdl.Context = function(config) {
@@ -1162,15 +1163,15 @@ Fdl.Context.prototype = {
 		propertiesInformation:null,
 		catalog:null,
 		/** translation catalog is autoloaded, set to false if you don't wan't autoload @type {Boolean}*/
-		autoLoadCatalog:true, 
+		autoLoadCatalog:true,
 		/** default locale 'fr' (french) or 'en' (english) @type {String}*/
-		locale:null, 
+		locale:null,
 		/** mapping family's document to special js class @type {Object}*/
 		familyMap:null,
 		getPropertiesInformation: function() {
 	if (! this.propertiesInformation) {
 			// not initialised yet i retreive the folder family
-			this.getDocument({id:2,useCache:false,onlyValues:false,propertiesInformation:true});			
+			this.getDocument({id:2,useCache:false,onlyValues:false,propertiesInformation:true});
 	}
 	return this.propertiesInformation;
 }
@@ -1188,7 +1189,7 @@ Fdl.Context.prototype.toString = function() {
  * @param {String} (optional) define an other locale
  * @return {Boolean} true if loaded is done
  */
-Fdl.Context.prototype.loadCatalog = function(locale) { 
+Fdl.Context.prototype.loadCatalog = function(locale) {
 	if (! locale) locale=this.locale;
 	if (!locale) {
 		var u=this.getUser();
@@ -1210,13 +1211,13 @@ Fdl.Context.prototype.loadCatalog = function(locale) {
  * get all sortable properties
  * @return {array} of property identificators
  */
-Fdl.Context.prototype.getSortableProperties = function() { 
+Fdl.Context.prototype.getSortableProperties = function() {
 	var f=[];
 		var pi=this.getPropertiesInformation();
 		for (var i in pi) {
 			if (pi[i].sortable) f.push(i);
 		}
-	
+
 	return f;
 };
 /**
@@ -1224,27 +1225,27 @@ Fdl.Context.prototype.getSortableProperties = function() {
  * @param {String} id the property id
  * @return {Object} example : {"type":"integer","displayable":true,"sortable":true,"filterable":true,"label":"identificateur"},
  */
-Fdl.Context.prototype.getPropertyInformation = function(id) { 
+Fdl.Context.prototype.getPropertyInformation = function(id) {
 	var pis=this.getPropertiesInformation();
-	
+
 	if (pis) {
 		var pi=pis[id];
 		if (pi) return pi;
-	} 
+	}
 	return null;
 };
 /**
   * get all displayable properties
   * @return {array} of property identificators
   */
-Fdl.Context.prototype.getDisplayableProperties = function() { 
+Fdl.Context.prototype.getDisplayableProperties = function() {
 	var f=[];
-	
+
 		var pi=this.getPropertiesInformation();
 		for (var i in pi) {
 			if (pi[i].displayable) f.push(i);
 		}
-	
+
 	return f;
 };
 
@@ -1252,20 +1253,20 @@ Fdl.Context.prototype.getDisplayableProperties = function() {
  * get all filterable properties
  * @return {array} of property identificators
  */
-Fdl.Context.prototype.getFilterableProperties = function() { 
+Fdl.Context.prototype.getFilterableProperties = function() {
 	var f=[];
-	
+
 		var pi=this.getPropertiesInformation();
 		for (var i in pi) {
 			if (pi[i].filterable) f.push(i);
 		}
-	
+
 	return f;
 };
 
 /**
  * To reconnect to another freedom server context
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1288,7 +1289,7 @@ Fdl.Context.prototype.connect = function(config) {
 };
 /**
  * Try to ping server if connection is detected one time return always true
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1326,7 +1327,7 @@ Fdl.Context.prototype.isConnected = function(config) {
                     config.onFail();
                 }
             };
-            
+
             if (config.timeout > 0) {
                 me._connectTimeId=setTimeout(function () {
                     if (me._isConnected === null) {
@@ -1357,7 +1358,7 @@ Fdl.Context.prototype.isConnected = function(config) {
 };
 /**
  * Verify is user is already authenticated
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1394,7 +1395,7 @@ Fdl.Context.prototype.isAuthenticated = function(config) {
 
 /**
  * Authenticate to server
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1438,7 +1439,7 @@ Fdl.Context.prototype.setAuthentification = function(config) {
 };
 /**
  * set error message
- * @param {String} msg the text message 
+ * @param {String} msg the text message
  * @param {String} code the code message
  * @return boolean
  */
@@ -1457,7 +1458,7 @@ Fdl.Context.prototype.getLastErrorMessage = function() {
 };
 /**
  * return translate message
- * @param {String} s the text to translate 
+ * @param {String} s the text to translate
  * @return {String}
  */
 Fdl.Context.prototype.getText = function(s) {
@@ -1465,7 +1466,7 @@ Fdl.Context.prototype.getText = function(s) {
 };
 /**
  * return translate message
- * @param {String} s the text to translate 
+ * @param {String} s the text to translate
  * @return {String}
  */
 Fdl.Context.prototype._ = function(s) {
@@ -1477,7 +1478,7 @@ Fdl.Context.prototype._ = function(s) {
 /**
  * Return user currently connected if already authenticate return always the
  * same object
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1496,7 +1497,7 @@ Fdl.Context.prototype.getUser = function(config) {
 	if (!this.user) {
 		this.user = new Fdl.User( {
 			context : this
-		});			
+		});
 		if (this.user.locale) this.locale=this.user.locale.substr(0,this.user.locale.indexOf('_'));
 
 	}
@@ -1517,136 +1518,154 @@ Fdl.Context.prototype.resizeImage = function(icon, width) {
  * Send a request to the server
  * @param Object urldata object list of key:value : {a:2,app:MYTEST,action:MYACTION}
  * @param Object parameters other parameters to complte urldata
- * @param Boolean anonymousmode 
- * @param String otherroot to call another file in same domain (it is forbidden to call another server domain) 
+ * @param Boolean anonymousmode
+ * @param String otherroot to call another file in same domain (it is forbidden to call another server domain)
  * @return Boolean true if ok
  */
-Fdl.Context.prototype.retrieveData = function(urldata, parameters,
-		anonymousmode, otherroot) {
-	var bsend = '';
-	var ANAKEENBOUNDARY = '--------Anakeen www.anakeen.com 2009';
-	var xreq=null;
-	if (typeof window != 'undefined') {
-		if (window.XMLHttpRequest) {
-			xreq = new XMLHttpRequest();
-		} else if (window.ActiveXObject) {
-			// branch for IE/Windows ActiveX version
-			xreq = new ActiveXObject("Microsoft.XMLHTTP");
-		}
-	} else {
-		xreq = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
-	}
-	var sync = true;
+Fdl.Context.prototype.retrieveData = function (urldata, parameters, anonymousmode, otherroot) {
+    var bsend = '';
+    var ANAKEENBOUNDARY = '--------Anakeen www.anakeen.com 2009';
+    var xreq = null;
+    if (typeof window != 'undefined') {
+        if (window.XMLHttpRequest) {
+            xreq = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            // branch for IE/Windows ActiveX version
+            xreq = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    } else {
+        xreq = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
+    }
+    var sync = true;
 
-	if (xreq) {
-	    if (parameters && parameters.onComplete) {
-	        sync=false;
-	        xreq.onreadystatechange=function () {
-	            if (xreq.readyState == 4) {
-	                if (xreq.status == 200) {
-	                    parameters.onComplete(xreq);
-	                } else {
-	                    if (parameters.onError) {
-	                        parameters.onError(xreq);
-	                    }
-	                }
-	            }
-	           
-	        }
-	    }
-		var url = this.url;
-		if (!url)
-			url = '/';
-		if (otherroot)
-			url += otherroot;
-		else if (anonymousmode)
-			url += 'guest.php';
-		else
-			url += 'data.php';
-		// url+='?';
-		var method = "POST";
-		if( (!urldata) && (!parameters) && otherroot ) {
-			method = "GET";
-		}
-		xreq.open(method, url, (!sync));
-		if (method) {
-			var name=null;
-			xreq.setRequestHeader("Content-Type",
-							"multipart/form-data; boundary=\""
-									+ ANAKEENBOUNDARY + "\"");
-			for (name in urldata) {
-				bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
-				bsend += "Content-Disposition: form-data; name=\"" + name
-						+ "\"\r\n\r\n";
-				bsend += urldata[name];
-			}
-			if (parameters) {
-				for (name in parameters) {
-					if (name != 'context') {
-						bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
-						bsend += "Content-Disposition: form-data; name=\"" + name
-						+ "\"\r\n\r\n";
-						if (typeof parameters[name]=='object') {
-							try {
+    if (xreq) {
+        if (parameters && parameters.onComplete) {
+            sync = false;
+            xreq.onreadystatechange = function () {
+                if (xreq.readyState == 4) {
+                    if (xreq.status == 200) {
+                        parameters.onComplete(xreq);
+                    } else {
+                        if (parameters.onError) {
+                            parameters.onError(xreq);
+                        }
+                    }
+                }
 
-								bsend += JSON.stringify(parameters[name]);
-							} catch (e){
-								bsend += parameters[name];
-							}
-						} else bsend += parameters[name];
-					}
-				}
-			}
-		}
-		applicationEvent.publish("startMonitorXHR", {XHR : xreq});
-		try {
-		    if (bsend.length == 0)
-		        xreq.send('');
-		    else
-		        xreq.send(bsend);
-		} catch (e) {
-		    this.setErrorMessage('HTTP status: unable to send request');
-		}
-		applicationEvent.publish("stopMonitorXHR", {XHR : xreq});
-		if (sync) {
-		    if (xreq.status == 200) {
-		        var r = false;
-		        try {
-		            var db1=new Date().getTime();
-		            if (parameters && parameters.plainfile) {
-		                r =  xreq.responseText;
-		            } else {
-		                r = eval('(' + xreq.responseText + ')');
-		                if (this.debug) r["evalDebugTime"]=(new Date().getTime())-db1;
-		                if (r.error) this.setErrorMessage(r.error);
-		                if (r.log) {
-		                    delete r.log;
-		                }
-		                if (r.spentTime)
-		                    logConsole( {
-		                        time : r.spentTime
-		                    });
-		                delete r.spentTime;
-		            }
-		        } catch (ex) {
-		            throw('error on serveur data:'+xreq.responseText);
-		        }
-		        return r;
-		    } else {
-		        if (xreq)
-		            this.setErrorMessage('HTTP status:' + xreq.status);
-		    }
-		}
-	}
-	return false;
+            }
+        }
+        var url = this.url;
+        if (!url) {
+            url = '/';
+        }
+        if (otherroot){
+            url += otherroot;
+        }
+        else if (anonymousmode) {
+            url += 'guest.php';
+        }
+        else {
+            url += 'data.php';
+        }
+        var method = "POST";
+        if ((!urldata) && (!parameters) && otherroot) {
+            method = "GET";
+        }
+        xreq.open(method, url, (!sync));
+        if (method) {
+            var name = null;
+
+            xreq.setRequestHeader("Content-Type",
+                "multipart/form-data; boundary=\""
+                    + ANAKEENBOUNDARY + "\"");
+            for (name in urldata) {
+                if (!urldata.hasOwnProperty(name)) {
+                    continue;
+                }
+                bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
+                bsend += "Content-Disposition: form-data; name=\"" + name
+                    + "\"\r\n\r\n";
+                bsend += urldata[name];
+            }
+            if (parameters) {
+                for (name in parameters) {
+                    if (!parameters.hasOwnProperty(name)) {
+                        continue;
+                    }
+                    if (name != 'context') {
+                        bsend += "\r\n--" + ANAKEENBOUNDARY + "\r\n";
+                        bsend += "Content-Disposition: form-data; name=\"" + name
+                            + "\"\r\n\r\n";
+                        if (typeof parameters[name] == 'object') {
+                            try {
+
+                                bsend += JSON.stringify(parameters[name]);
+                            } catch (e) {
+                                bsend += parameters[name];
+                            }
+                        } else bsend += parameters[name];
+                    }
+                }
+            }
+        }
+        applicationEvent.publish("startMonitorXHR", {XHR : xreq});
+        try {
+            if (bsend.length == 0) {
+                xreq.send('');
+            }
+            else {
+                xreq.send(bsend);
+            }
+        } catch (e) {
+            this.setErrorMessage('HTTP status: unable to send request');
+        }
+        applicationEvent.publish("stopMonitorXHR", {XHR : xreq});
+        if (sync) {
+            if (xreq.status == 200) {
+                var result = false;
+                try {
+                    var db1 = new Date().getTime();
+                    if (parameters && parameters.plainfile) {
+                        result = xreq.responseText;
+                    } else {
+                        result = JSON.parse(xreq.responseText);
+                        if (this.debug) {
+                            result["evalDebugTime"] = (new Date().getTime()) - db1;
+                        }
+                        if (result.error) {
+                            this.setErrorMessage(result.error);
+                        }
+                        if (result.log) {
+                            delete result.log;
+                        }
+                        if (result.spentTime) {
+                            logConsole({
+                                time : result.spentTime
+                            });
+                        }
+                        delete result.spentTime;
+                    }
+                } catch (ex) {
+                    throw('error on serveur data:' + xreq.responseText);
+                }
+                return result;
+            } else {
+                if (xreq) {
+                    this.setErrorMessage('HTTP status:' + xreq.status);
+                    throw "URL : "+url+"\n Param :"+JSON.stringify(parameters)+"\n HTTP status:" + xreq.status+"\n xreq content :"+ xreq.responseText;
+                }
+            }
+        }
+    }
+    return false;
 };
 
 /**
  * Send a request to the server
- * @param Object filepath 
+ * @param Object filepath
  * @param Object parameters other parameters to complte urldata
- * @param Boolean anonymousmode 
- * @param String otherroot to call another file in same domain (it is forbidden to call another server domain) 
+ * @param Boolean anonymousmode
+ * @param String otherroot to call another file in same domain (it is forbidden to call another server domain)
  * @return Boolean true if ok
  */
 Fdl.Context.prototype.retrieveFile = function(filepath, parameters) {
@@ -1656,7 +1675,7 @@ Fdl.Context.prototype.retrieveFile = function(filepath, parameters) {
  * Send a form to the server
  * @param Object urldata object list of key:value : {a:2,app:MYTEST,action:MYACTION}
  * @param String target target where send result (can be _hidden to not see the result or if result is a file which will be downloading in your desktop)
- * @param String otherroot to call another file in same domain (it is forbidden to call another server domain) 
+ * @param String otherroot to call another file in same domain (it is forbidden to call another server domain)
  * @return Boolean true if ok
  */
 Fdl.Context.prototype.sendForm = function(urldata, target, otherroot) {
@@ -1685,7 +1704,7 @@ Fdl.Context.prototype.sendForm = function(urldata, target, otherroot) {
 				newElement.value= JSON.stringify(urldata[name]);
 			} catch (e){
 				newElement.value = urldata[name];
-			} 
+			}
 		}else newElement.value = urldata[name];
 	}
 	form.submit();
@@ -1694,13 +1713,13 @@ Fdl.Context.prototype.sendForm = function(urldata, target, otherroot) {
 
 /**
  * get a document object
- * 
+ *
  * @param {object} config
  *     <p><ul>
  *          <li><b>familyName</b> family name to map</li>
  *          <li><b>className</b> class name to map</li>
  *     </ul></p>
- *     
+ *
  * @return {Boolean}
  */
 Fdl.Context.prototype.addFamilyMap = function(config) {
@@ -1722,7 +1741,7 @@ Fdl.Context.prototype.stringToFunction = function(str) {
 
 /**
  * get a document object
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1753,8 +1772,8 @@ Fdl.Context.prototype.stringToFunction = function(str) {
 			}
 		});
 		if (d && d.isAlive()) {
-			var dl = d.getStoredContent(); // document list object			
-			var p = dl.getDocuments();  // array of Fdl.Documents   
+			var dl = d.getStoredContent(); // document list object
+			var p = dl.getDocuments();  // array of Fdl.Documents
  *            </code></pre>
  *            </li>
  *            </ul>
@@ -1779,8 +1798,10 @@ Fdl.Context.prototype.getDocument = function(config) {
 	var docid = config.id;
 
 	var latest=true;
-	if (typeof config == 'object' && config.latest === false) latest=false;
-	
+	if (typeof config == 'object' && config.latest &&config.latest === false) {
+        latest=false;
+    }
+
 	if (docid && (typeof docid == 'object') && (docid.length==1)) {
 		docid=docid[0];
 		config.id=docid;
@@ -1795,7 +1816,7 @@ Fdl.Context.prototype.getDocument = function(config) {
 	if (config.data && config.data.properties && config.data.properties.id && docid) {
 	    if (latest) {
 	        // verify revdate
-	        if (this._documents[docid] && this._documents[docid]._data && 
+	        if (this._documents[docid] && this._documents[docid]._data &&
 	                (config.data.requestDate <= this._documents[docid]._data.requestDate)) {
 	            // use cache if data is oldest cache
 	           // logConsole("use latest cache", docid, this._documents[docid].getTitle());
@@ -1819,13 +1840,13 @@ Fdl.Context.prototype.getDocument = function(config) {
 	   return null;
    }
 	var wdoc = new Fdl.Document(config);
-  
-	
+
+
 	if (! wdoc._data) return null;
 	if (this.familyMap != null && this.familyMap[wdoc.getProperty('fromname')]) {
 		var sname=wdoc.getProperty('fromname');
 		config.data = wdoc._data;
-		
+
 		var sclass=this.stringToFunction(this.familyMap[sname]);
 		wdoc = new sclass(config);
 	}else if ((wdoc.getProperty('defdoctype') == 'D')
@@ -1848,7 +1869,7 @@ Fdl.Context.prototype.getDocument = function(config) {
 			if ((docid!=wdoc.getProperty('id')) && (docid!=wdoc.getProperty('initid'))) {
 				this._documents[docid] = wdoc; // other alias cache
 			}
-		} else {	
+		} else {
 			this._fixDocuments[wdoc.getProperty('id')] = wdoc;
 		}
 	}
@@ -1858,7 +1879,7 @@ Fdl.Context.prototype.getDocument = function(config) {
 /**
  * get the notifier object after the first call retrun always the same notifier
  * object : one notifier by context
- * 
+ *
  * @param {object}
  *            config
  *            <p>
@@ -1887,7 +1908,7 @@ Fdl.Context.prototype.getNotifier = function(config) {
 };
 /**
  * get a new search document
- * 
+ *
  * @param {object}
  *            config (see
  *            {@link Fdl.SearchDocument configuration of Fdl.SearchDocument } )
@@ -1905,12 +1926,12 @@ Fdl.Context.prototype.getSearchDocument = function(config) {
 
 /**
  * get available operators for search criteria by attribute type
- * @return {Object} the operator available by attribute type  
+ * @return {Object} the operator available by attribute type
 {text:[{operator:'=', label:'equal', operand:['left','right'],labelTpl:'{left} is equal to {right}'},{operator:'~*', label:'include',operand:['left','right'],labelTpl:'{left} is equal to {right}'}],integer:[{operator:'=', label:'equal'},{operator:'>', label:'&gt;'}],...
  */
-Fdl.Context.prototype.getSearchCriteria = function() { 
+Fdl.Context.prototype.getSearchCriteria = function() {
 	if (this._opcriteria) return this._opcriteria;
-	
+
 	var r= this.retrieveData({app:'DATA',action:'DOCUMENT',
 		method:'getsearchcriteria'});
 	if (! r.error) {
@@ -1922,7 +1943,7 @@ Fdl.Context.prototype.getSearchCriteria = function() {
 
 /**
  * get a groupRequest object
- * 
+ *
  * @param {object}
  *            config
  * @return {Fdl.GroupRequest} return the object group request
@@ -1938,7 +1959,7 @@ Fdl.Context.prototype.createGroupRequest = function(config) {
 };
 /**
  * get home folder of current user
- * 
+ *
  * @return {Fdl.Collection} the home folder, null is no home
  */
 Fdl.Context.prototype.getHomeFolder = function(config) {
@@ -1959,7 +1980,7 @@ Fdl.Context.prototype.getHomeFolder = function(config) {
 };
 /**
  * get desktop folder of current user
- * 
+ *
  * @return {Fdl.Collection} the home folder, null is no desktop folder
  */
 Fdl.Context.prototype.getDesktopFolder = function(config) {
@@ -1980,7 +2001,7 @@ Fdl.Context.prototype.getDesktopFolder = function(config) {
 };
 /**
  * get offline folder of current user
- * 
+ *
  * @return {Fdl.Collection} the home folder, null is no offline folder
  */
 Fdl.Context.prototype.getOfflineFolder = function(config) {
@@ -2001,7 +2022,7 @@ Fdl.Context.prototype.getOfflineFolder = function(config) {
 };
 /**
  * get basket folder of current user
- * 
+ *
  * @return {Fdl.Collection} the home folder, null is no home
  */
 Fdl.Context.prototype.getBasketFolder = function(config) {
@@ -2017,7 +2038,7 @@ Fdl.Context.prototype.getBasketFolder = function(config) {
 			this._basketFolder = h;
 			return h;
 		} else {
-			var f=new Fdl.DocumentFilter({family:'DIR strict',  
+			var f=new Fdl.DocumentFilter({family:'DIR strict',
 				criteria:[{operator:'=',
 					left:'owner',
 					right:'-'+u.id}]});
@@ -2034,7 +2055,7 @@ Fdl.Context.prototype.getBasketFolder = function(config) {
 };
 /**
  * create a new object document (not set in database since it is saved)
- * 
+ *
  * @param {Object}
  *            config
  *            <ul>
@@ -2077,7 +2098,7 @@ Fdl.Context.prototype.createDocument = function(config) {
 
 /**
  * get application object
- * 
+ *
  * @param {object} config
  * <ul>
  * <li><b>name : </b> (String) the application name</li>
@@ -2087,13 +2108,13 @@ Fdl.Context.prototype.createDocument = function(config) {
 Fdl.Context.prototype.getApplication = function(config) {
 	if (config) config.context = this;
 	else config = {context : this};
-	
+
 	var a= new Fdl.Application(config);
 	if (! a.id ) return null;
 	return a;
 };
 /**
- * 
+ *
  * @param config .id the param identificator
  * <ul><li><b>id : </b>the param identificator</li>
  * </ul>
@@ -2108,7 +2129,7 @@ Fdl.Context.prototype.getParameter = function (config) {
     }
   };
 /**
- * 
+ *
  * @param config .id the param identificator
  * <ul><li><b>id : </b>the param identificator</li>
  *     <li><b>value : </b>the value</li>
@@ -2129,7 +2150,7 @@ Fdl.Context.prototype.getParameter = function (config) {
  */
 
 /**
- * @class Fdl.Notifier 
+ * @class Fdl.Notifier
  * this class can be use to notify javascript object of freedom activity
  * <pre><code>
 var C=new Fdl.Context({url:'http://my.freedom/'});
@@ -2139,7 +2160,7 @@ d.fireEvent=function (code,args) {
 }
 
 var n=C.getNotifier();
-n.loop(); 
+n.loop();
 var x=n.subscribe(d);
  // or var x=n.subscribe({object:d,callback:'fireEvent'});
  * </core></pre>
@@ -2167,7 +2188,7 @@ Fdl.Notifier.prototype = {
      * @property
      */
     subscribeItems:[]
-    
+
 };
 Fdl.Notifier.prototype.toString= function() {
       return 'Fdl.Notifier';
@@ -2195,7 +2216,7 @@ var x=n.subscribe(d);
 Fdl.Notifier.prototype.subscribe = function(obj) {
     var sobj=obj;
     var scall='fireEvent';
-       
+
     if (obj && obj.object) {
 	sobj=obj.object;
 	if (! obj.callback) {
@@ -2206,7 +2227,7 @@ Fdl.Notifier.prototype.subscribe = function(obj) {
 	}
 	for (var i=0;i<this.subscribeItems.length;i++) {
 	    if (this.subscribeItems[i].object==obj.object) return false;
-	}	
+	}
 	this.subscribeItems.push({object:sobj,callback:scall});
 	return true;
     }
@@ -2243,8 +2264,8 @@ Fdl.Notifier.prototype.unsubscribe = function(sobj) {
 
 /**
  * retrieve new {@link Fdl.Notifier.Notification notifications} since last retrievement
- * 
- * @return {Array} the Fdl.Notifier.Notification array 
+ *
+ * @return {Array} the Fdl.Notifier.Notification array
  */
 Fdl.Notifier.prototype.retreive = function(config) {
     if (this.context) {
@@ -2302,12 +2323,12 @@ Fdl.Notifier.prototype.loop = function(config) {
  * @param {Object} config
  */
 Fdl.Notifier.Notification = function (config) {
-    
+
 };
 Fdl.Notifier.Notification.prototype = {
    /**
      * Event code
-     * the system codes are  
+     * the system codes are
      * <ul>
 <li><b>create : </b> When a new document is created</li>
 <li><b>changed : </b> when document is modified</li>
@@ -2341,19 +2362,19 @@ Fdl.Notifier.Notification.prototype = {
      */
     date:null,
    /**
-     * Identificator of notified document 
+     * Identificator of notified document
      * @type Number
      * @property
      */
     id:null,
     /**
-     * Initial identificator of notified document 
+     * Initial identificator of notified document
      * @type Number
      * @property
      */
     initid:null,
     /**
-     * Title of notified document 
+     * Title of notified document
      * @type Date
      * @property
      */
@@ -2375,7 +2396,7 @@ Fdl.Notifier.Notification.prototype = {
      * @type String
      * @property
      */
-    uname:null    
+    uname:null
 };
 
 /**
@@ -2388,7 +2409,7 @@ Fdl.Notifier.Notification.prototype = {
  * The document object
  * <pre><code>
 var C=new Fdl.Context({url:'http://my.freedom/'});
-  
+
 var d=C.getDocument({id:9});
 if (d && d.isAlive()) {
     throw(d.getTitle());
@@ -2398,7 +2419,7 @@ if (d && d.isAlive()) {
  * @param {Object} config
  * @cfg {String/Number} id document identificator. Could be a logical identificator (a string) or a system identificator (a number)
  * @cfg {Boolean} latest (Optional)  set to false if you don't want the latest revision but the exact revision given by id
- * @cfg {Number} revision (Optional) retrieve a specific revision of the document. 0 is the first. 
+ * @cfg {Number} revision (Optional) retrieve a specific revision of the document. 0 is the first.
  * @cfg {Object} data (Optional) initialize document object from raw data (internal use)
  */
 
@@ -2410,10 +2431,10 @@ Fdl.Document = function(config){
 	}
 	if (! config.data) {
 	    this.id = config.id;
-	    
+
 	    this.latest = (config.latest == null) ? false : config.latest;
-	    this.revision = (this.latest == true) ? null : config.revision;	
-	    
+	    this.revision = (this.latest == true) ? null : config.revision;
+
 	    this._data=null;
 	    if (this.id)  data=this.context.retrieveData({app:'DATA',action:'DOCUMENT'},config);
 	} else data=config.data;
@@ -2435,10 +2456,10 @@ Fdl.Document.prototype = {
      * Initialize object with raw data
      * @param {Object} data row data
      * @return {Boolean} return true if no errors
-     */ 
+     */
     affect: function (data) {
 	if (data && (typeof data == 'object')) {
-	    if (! data.error) {	  
+	    if (! data.error) {
 		this._mvalues=new Object();
 		this._data=data;
 		//	      this._properties=data.properties;
@@ -2467,21 +2488,21 @@ Fdl.Document.prototype = {
     /**
      * Return the title of the document
      * @return {String} the title
-     */ 
+     */
     getTitle: function(otherid){
 	if (! this._data) return null;
 	if (otherid) {
-	    
+
 	    return "search "+otherid;
 	} else {
 	    return this._data.properties.title;
 	}
-    },	
+    },
     /**
      * Get url to the file icon of the document
      * @param {Number} width the width of icon in pixel
      * @return {String} return the url
-     */ 
+     */
     getIcon: function(config) {
 	if (! this._data) return null;
 	var width=false;
@@ -2499,25 +2520,25 @@ Fdl.Document.prototype = {
         src=this.context.url+this._data.properties.icon;
     }
 	return src;
-    },	
+    },
     /**
-     * Get state of document 
+     * Get state of document
      * @return {String} return the state key
-     */ 
+     */
     getState: function(){
 	return this._data.properties.state;
-    }, 
+    },
     /**
-     * Get label state of document 
+     * Get label state of document
      * @return {String} return the state key
-     */ 
+     */
     getLocalisedState: function(){
 	return this._data.properties.labelstate;
     },
     /**
      * Get associated color of the current state
      * @return {String} return RGB color (#RRGGBB)
-     */ 
+     */
     getColorState: function(){
 	return this._data.properties.colorstate;
     },
@@ -2536,8 +2557,8 @@ Fdl.Document.prototype = {
     getValue: function(id, def) {
     	var v=this._data.values[id];
     	return ((v==null)?def:v);
-    }, 
-   
+    },
+
     /**
      * return all values of the array
      * @param {String} id the attribute identificator
@@ -2558,7 +2579,7 @@ Fdl.Document.prototype = {
     			}
     			for ( i=0; i< oas.length; i++) {
     				vc=this.getValue(oas[i].id);
-    				for (var ic=0;ic<vc.length;ic++) {	    
+    				for (var ic=0;ic<vc.length;ic++) {
     					rv[ic][oas[i].id]=vc[ic];
     				}
     			}
@@ -2566,7 +2587,7 @@ Fdl.Document.prototype = {
     	}
     	return rv;
 
-    }, 
+    },
     /**
      * Get formated value of a attribute
      * For relation attributes return document title, for enumerate return label
@@ -2584,7 +2605,7 @@ Fdl.Document.prototype = {
     				 tv=[];
     				 vs=this._data.values[id];
     				if (vs) {
-    				for (i=0;i<vs.length;i++) {   
+    				for (i=0;i<vs.length;i++) {
     					tv.push(oa.getEnumLabel({key:vs[i]}));
     				}
     				}
@@ -2598,7 +2619,7 @@ Fdl.Document.prototype = {
     				 tv=[];
     				 vs=this._data.values[id];
     				if (vs) {
-    				for (i=0;i<vs.length;i++) {   					
+    				for (i=0;i<vs.length;i++) {
     					if (config && config.url) {
     						if (config.dav) {
         						tv.push(oa.getDavUrl(vs[i],this.id));
@@ -2626,20 +2647,20 @@ Fdl.Document.prototype = {
     				dateFmt=fmt.dateTimeFormat;
     			}  else if (oa.type=='time') {
     				dateFmt=fmt.timeFormat;
-    			}  
+    			}
     			if (dateFmt) {
     				return Fdl.formatDate(this._data.values[id],dateFmt);
-    			} 
-    			
+    			}
+
     		}
     	}
     	return Fdl.encodeHtmlTags(this._data.values[id]);
     },
-    
+
     /**
      * set value to an attribute
      * the document is not updated in database server until it will saved
-     * @param {string } id the attribute identificator 
+     * @param {string } id the attribute identificator
      * @param {String} value the new value to set
      * @return {boolean} true if set succeed
      */
@@ -2653,7 +2674,7 @@ Fdl.Document.prototype = {
     		this.context.setErrorMessage(this.context._("setValue: document is fixed"));
     		return null;
     	}
-    	if (value != this._data.values[oa.id]) {      	
+    	if (value != this._data.values[oa.id]) {
     		this._data.values[oa.id]=value;
     		this._mvalues[oa.id]=value;
     	}
@@ -2706,7 +2727,7 @@ Fdl.Document.prototype = {
     },
 
     /**
-     * return all attrtibutes values 
+     * return all attrtibutes values
      * @return {Object} indexed array [{key:value},{key:value}....]
      */
     getValues: function() {
@@ -2733,7 +2754,7 @@ Fdl.Document.prototype = {
     		return this.getFamilyAttributes();
     	}
 	return this._attributes;
-    },	   
+    },
     /**
      * Return all attributes definition of the document
      * @return {Array} return all attribute Fdl.Attribut definition
@@ -2752,7 +2773,7 @@ Fdl.Document.prototype = {
     		}
     	}
 	  return this._attributes;
-    },	
+    },
     /**
      * Return all attributes of the document which can be sorted
      * @return {Array} return all attribute Fdl.Attribut definition
@@ -2767,7 +2788,7 @@ Fdl.Document.prototype = {
 	    }
 	}
 	return s;
-    },	
+    },
     /**
      * Return all attributes of the document which can be filtered or searchable
      * @return {Array} return all attribute Fdl.Attribut definition
@@ -2785,7 +2806,7 @@ Fdl.Document.prototype = {
 	    }
 	}
 	return s;
-    },	
+    },
     /**
      * verify if document exist and it is not in the trash
      * @return {Boolean} return true if exists
@@ -2829,7 +2850,7 @@ Fdl.Document.prototype = {
     	var dt=this.getProperty('defdoctype');
     	return ((dt =='S')||(dt=='D'));
     }
-    
+
 
 };
 
@@ -2900,26 +2921,26 @@ Fdl.Document.prototype.completeAttributes = function(attrs) {
  */
 Fdl.Document.prototype.toJSON = function(key) {
     return JSON.parse(JSON.stringify(this._data));
-    
+
 };
 
 Fdl.Document.prototype.send = function(config){
-	
+
 	var result = this.context.retrieveData({
 		app: 'DATA',
 		action: 'DOCUMENT',
 		id: this.id,
 		method: 'send'
 	},config);
-	
+
 	if(result){
 		return true;
 	} else {
 		this.context.setErrorMessage('send : no result');
 		return false ;
 	}
-	
-	
+
+
 };
 
 /**
@@ -2942,18 +2963,18 @@ Fdl.Document.prototype.save = function(config) {
 				      method:'save',
 				      temporary:this.getProperty('doctype')=='T',
 				      id:this.id,autounlock:autounlock},this._mvalues);
-	
+
 	if (newdata) {
 	    if (! newdata.error) {
 		this.affect(newdata);
 		return true;
-	    } else {	
+	    } else {
 		this.context.setErrorMessage(newdata.error);
 	    }
-	} else {      
+	} else {
 	    this.context.setErrorMessage('save : no data');
 	}
-	return false;    
+	return false;
     }
 };
 
@@ -2962,7 +2983,7 @@ Fdl.Document.prototype.save = function(config) {
  * inputs of document mult named with attribute ids
  * <pre>
 &lt;form id="myform"
-       method="POST" ENCTYPE="multipart/form-data" &gt;    
+       method="POST" ENCTYPE="multipart/form-data" &gt;
 &lt;label for="i_ba_dec"&gt;ba _desc&lt;/label&gt;&lt;input id="i_ba_desc" type="text" name="ba_desc"/&gt;
 &lt;label for="i_fi_ofile"&gt;File&lt;/label&gt;&lt;input id="i_fi_ofile" type="file" name="fi_ofile[1]"/&gt;
 &lt;label for="i_fi_subject"&gt;Subject&lt;/label&gt;&lt;input id="i_fi_subject" type="text" name="fi_subject"/&gt;
@@ -2970,11 +2991,11 @@ Fdl.Document.prototype.save = function(config) {
  * </pre>
  * <pre><code>
  var doc=context.getDocument({id:6790});
- if (! doc.save({form:document.getElementById('myform'),callback:mycallback })) {    
+ if (! doc.save({form:document.getElementById('myform'),callback:mycallback })) {
     var t='ERROR:'+Fdl.getLastErrorMessage();
     throw(t);
   }
-  
+
 function mycallback(doc) {
   // I am after saved
   throw(doc.getValue('ba_desc'));
@@ -2985,7 +3006,7 @@ function mycallback(doc) {
  */
 Fdl.Document.prototype.savefromform = function(config) {
 	if (config && config.form!==null) {
-		if (config.form.nodeName != 'FORM' && config.form.nodeName != 'html:form') {	  
+		if (config.form.nodeName != 'FORM' && config.form.nodeName != 'html:form') {
 			this.context.setErrorMessage('not a form object');
 			return false;
 		}
@@ -2996,7 +3017,7 @@ Fdl.Document.prototype.savefromform = function(config) {
 		if (oritarget) t=document.getElementById(f.target);
 
 		if (t && t.contentDocument.body.firstChild) {
-			t.contentDocument.body.innerHTML='';	  
+			t.contentDocument.body.innerHTML='';
 		}
 		var callid=Fdl._waitSave(this, config);
 		f.action=this.context.url+'?app=DATA&action=DOCUMENT&method=saveform&id='+this.id+'&callid='+callid;
@@ -3006,7 +3027,7 @@ Fdl.Document.prototype.savefromform = function(config) {
 		f.submit();
 		if (t && t.contentDocument.body.firstChild) {
 			try {
-				var v=eval('('+t.contentDocument.body.innerHTML+')');	  
+				var v=eval('('+t.contentDocument.body.innerHTML+')');
 				//	  Fdl.print_r(v);
 			} catch (ex) {
 			}
@@ -3035,10 +3056,10 @@ Fdl.Document.prototype.reload = function(config) {
 	} else {
 		if (! config) config=new Object();
 		config.method='reload';
-		return this.callMethod(config);	
+		return this.callMethod(config);
 	}
-	return false;    
-}; 
+	return false;
+};
 
 /**
  * set new state to document
@@ -3051,7 +3072,7 @@ Fdl.Document.prototype.changeState = function(config) {
 	if (! config) config=new Object();
 	config.method='changestate';
 	return this.callMethod(config);
-}; 
+};
 
 /**
  * add user tag to document
@@ -3067,9 +3088,9 @@ Fdl.Document.prototype.addUserTag = function(config) {
 	if (! config.tag){
 		this.context.setErrorMessage(this.context._("data::no tag specified"));
 		return null;
-	}  
+	}
 	return this.callMethod(config);
-}; 
+};
 /**
  * delete user tag to document
  * @param {Object} config
@@ -3083,9 +3104,9 @@ Fdl.Document.prototype.deleteUserTag = function(config) {
 	if (! config.tag){
 		this.context.setErrorMessage(this.context._("data::no tag specified"));
 		return null;
-	}  
+	}
 	return this.callMethod(config);
-}; 
+};
 /**
  * get user tags from document
  * @param {Object} config
@@ -3104,7 +3125,7 @@ Fdl.Document.prototype.getUserTags = function(config) {
 		return r.userTags;
 	}
 	return null;
-}; 
+};
 /**
  * affect a user to the document
  * @param {Object} config
@@ -3119,7 +3140,7 @@ Fdl.Document.prototype.allocate = function(config) {
 	if (! config) config=new Object();
 	config.method='allocate';
 	return this.callMethod(config);
-}; 
+};
 /**
  * unaffect user to the document. The document has not allocated user after
  * @param {Object} config
@@ -3132,7 +3153,7 @@ Fdl.Document.prototype.unallocate = function(config) {
 	if (! config) config=new Object();
 	config.method='unallocate';
 	return this.callMethod(config);
-}; 
+};
 
 /**
  * set document to the trash
@@ -3147,8 +3168,8 @@ Fdl.Document.prototype.remove = function(config) {
 		config.method='delete';
 		return this.callMethod(config);
 	}
-	return false;    
-}; 
+	return false;
+};
 
 /**
  * go out document from the trash
@@ -3161,9 +3182,9 @@ Fdl.Document.prototype.restore = function(config) {
 	} else {
 		if (! config) config=new Object();
 		config.method='restore';
-		return this.callMethod(config);	
+		return this.callMethod(config);
 	}
-	return false;    
+	return false;
 };
 
 /**
@@ -3186,21 +3207,21 @@ Fdl.Document.prototype.unlock = function(config) {
 };
 
 
-Fdl.Document.prototype.hasWaitingFiles = function() {   
+Fdl.Document.prototype.hasWaitingFiles = function() {
     var data=this.context.retrieveData({app:'DATA',action:'DOCUMENT',
 			       method:'haswaitingfiles',
 			       id:this.id});
     if (data) {
-	if (! data.error) {	  
+	if (! data.error) {
 	    return data.haswaitingfiles;
-	} else {	
+	} else {
 	    this.context.setErrorMessage(data.error);
 	}
-    } else {      
+    } else {
 	this.context.setErrorMessage('hasWaitingFiles : no data');
     }
-    
-    return false;    
+
+    return false;
 };
 
 Fdl.Document.prototype.getFollowingStates = function() {
@@ -3211,17 +3232,17 @@ Fdl.Document.prototype.getFollowingStates = function() {
 				   method:'getfollowingstates',
 				   id:this.id});
 	if (data) {
-	    if (! data.error) {	  
+	    if (! data.error) {
 		this.followingStates=data.followingStates;
 		return data.followingStates;
-	    } else {	
+	    } else {
 		this.context.setErrorMessage(data.error);
 	    }
-	} else {      
+	} else {
 	    this.context.setErrorMessage('getFollowingStates : no data');
-	}	
+	}
     }
-    return false;    
+    return false;
 };
 
 
@@ -3263,14 +3284,14 @@ Fdl.Document.prototype.callMethod = function(config) {
 		    else return data;
 		}
 		return true;
-	    } else {	
+	    } else {
 		this.context.setErrorMessage(data.error);
 	    }
-	} else {      
+	} else {
 	    this.context.setErrorMessage(config.method+' : no data');
 	}
     }
-    return false;    
+    return false;
 };
 
 /**
@@ -3299,14 +3320,14 @@ Fdl.Document.prototype.cloneDocument = function(config) {
 		clone.affect(data);
 
 		return clone;
-	    } else {	
+	    } else {
 		this.context.setErrorMessage(data.error);
 	    }
-	} else {      
+	} else {
 	    this.context.setErrorMessage(config.method+' : no data');
 	}
-    
-    return null;    
+
+    return null;
 };
 
 /**
@@ -3323,7 +3344,7 @@ Fdl.Document.prototype.moveTo = function(config) {
 	config.method='moveto';
 	return this.callMethod(config);
     }
-    return false;    
+    return false;
 };
 
 /**
@@ -3336,8 +3357,8 @@ Fdl.Document.prototype.getViews = function() {
 		return null;
 	} else if (this._data.configuration && this._data.configuration.views) {
 		return this._data.configuration.views;
-	}        
-	return false;    
+	}
+	return false;
 };
 /**
  * get the default consultation view for this document
@@ -3350,7 +3371,7 @@ Fdl.Document.prototype.getDefaultConsultationView = function() {
 			if ((vs[v]['default']=="yes") && (vs[v].kind=="consultation")) return vs[v];
 		}
 	}
-	return false;    
+	return false;
 };
 /**
  * get all possible edition views for this document
@@ -3363,7 +3384,7 @@ Fdl.Document.prototype.getDefaultEditionView = function() {
 			if ((vs[v]['default']=="yes") && (vs[v].kind=="edition")) return vs[v];
 		}
 	}
-	return false;    
+	return false;
 };
 
 /**
@@ -3391,7 +3412,7 @@ MAIL_ARTICLE_TO_APPROUV]
    * @param bool reset : if true force another request
    * @return {array} of object
    */
-Fdl.Document.prototype.getAttachedTimers = function(config) {   
+Fdl.Document.prototype.getAttachedTimers = function(config) {
 	if (! this.id) return null;
 	if (this.attachedTimers && ((!config) || (config && (!config.reset)))) return this.attachedTimers;
 	else {
@@ -3399,18 +3420,18 @@ Fdl.Document.prototype.getAttachedTimers = function(config) {
 			method:'getAttachedTimers',
 			id:this.id});
 		if (data) {
-			if (! data.error) {	  
+			if (! data.error) {
 				this.attachedTimers=data.attachedTimers;
 				return data.attachedTimers;
-			} else {	
+			} else {
 				this.context.setErrorMessage(data.error);
 			}
-		} else {      
+		} else {
 			this.context.setErrorMessage('getAttachedTimers : no data');
-		}	
+		}
 	}
 
-	return false; 
+	return false;
 };
 
 /**
@@ -3418,31 +3439,31 @@ Fdl.Document.prototype.getAttachedTimers = function(config) {
    * @param string : the acl
    * @return {Boolean} true is acces granted
    */
-Fdl.Document.prototype.control = function(acl) {   
+Fdl.Document.prototype.control = function(acl) {
 	if (! this.id) return null;
 	if (! this._data.security) return null;
 	if (! acl) return null;
 	if (acl.acl) acl=acl.acl;
-	if (this._data.security[acl]) {    
+	if (this._data.security[acl]) {
 		return this._data.security[acl].control;
-	}	
-	return null; 
+	}
+	return null;
 };
 /**
    * get all attached timers informations
    * @param bool reset : if true force another request
    * @return array
    */
-Fdl.Document.prototype.getProfilAcls = function() {   
+Fdl.Document.prototype.getProfilAcls = function() {
 	if (! this.id) return null;
 	if (this._data.security) return this._data.security;
-	return false; 
+	return false;
 };
 /**
   * get all filterable properties
   * @return {array} of property identificators
   */
-Fdl.Document.prototype.getFilterableProperties = function() { 
+Fdl.Document.prototype.getFilterableProperties = function() {
 	f=[];
 	if (this.context) {
 		return this.context.getFilterableProperties();
@@ -3454,7 +3475,7 @@ Fdl.Document.prototype.getFilterableProperties = function() {
   * get all displayable properties
   * @return {array} of property identificators
   */
-Fdl.Document.prototype.getDisplayableProperties = function() { 
+Fdl.Document.prototype.getDisplayableProperties = function() {
 	f=[];
 	if (this.context) {
 		return this.context.getDisplayableProperties();
@@ -3465,7 +3486,7 @@ Fdl.Document.prototype.getDisplayableProperties = function() {
   * get all sortable properties
   * @return {array} of property identificators
   */
-Fdl.Document.prototype.getSortableProperties = function() { 
+Fdl.Document.prototype.getSortableProperties = function() {
 	f=[];
 	if (this.context) {
 		return this.context.getSortableProperties();
@@ -3477,7 +3498,7 @@ Fdl.Document.prototype.getSortableProperties = function() {
  * @param {String} id the property id
  * @return {Object} example : {"type":"integer","displayable":true,"sortable":true,"filterable":true,"label":"identificateur"},
  */
-Fdl.Document.prototype.getPropertyInformation = function(id) { 
+Fdl.Document.prototype.getPropertyInformation = function(id) {
 	if (this.context) {
 		return this.context.getPropertyInformation(id);
 	}
@@ -3485,10 +3506,10 @@ Fdl.Document.prototype.getPropertyInformation = function(id) {
 };
 /**
  * get available operators for search criteria by attribute type
- * @return {Object} the operator available by attribute type  
+ * @return {Object} the operator available by attribute type
 {text:[{operator:'=', label:'equal', operand:['left','right'],labelTpl:'{left} is equal to {right}'},{operator:'~*', label:'include',operand:['left','right'],labelTpl:'{left} is equal to {right}'}],integer:[{operator:'=', label:'equal'},{operator:'>', label:'&gt;'}],...
  */
-Fdl.Document.prototype.getSearchCriteria = function() { 
+Fdl.Document.prototype.getSearchCriteria = function() {
 	if (this.context) return this.context.getSearchCriteria();
 	return null;
 };
@@ -3513,9 +3534,9 @@ Fdl.Document.prototype.getHighlight = function() { // in case of search with hig
 
 /**
  * @class Fdl.DocumentList describe the object returned by getContent or Search
- * 
- * 
- * 
+ *
+ *
+ *
  * @namespace Fdl.Document
  * @cfg {String} mainSelector indicate selection scheme none or all
  * @cfg {Fdl.Collection} collection the collection reference
@@ -3534,39 +3555,39 @@ Fdl.DocumentList = function(config) {
 Fdl.DocumentList.prototype = {
 	/**
 	 * total number of matches document
-	 * 
+	 *
 	 * @type Numeric none or all
 	 */
 	totalCount : 0,
 	/**
 	 * The array of raw document
-	 * 
+	 *
 	 * @type Array
 	 */
 	content : null,
 	/**
 	 * Additionnal informations about collection
-	 * 
+	 *
 	 * @type Object
 	 */
 	info : null,
 
 	/**
 	 * count of document list
-	 * 
+	 *
 	 * @type Numeric
 	 */
 	length : 0,
 	/**
 	 * Connexion context
-	 * 
+	 *
 	 * @type Fdl.Context
 	 */
 	context : null,
 	/**
 	 * return all document objects return by Fdl.Collection::getContent() or
 	 * Fdl.SearchDocument::search()
-	 * 
+	 *
 	 * @return {Array} document (FDl.Document) array
 	 */
 	getDocuments : function() {
@@ -3584,28 +3605,28 @@ Fdl.DocumentList.prototype = {
 	/**
 	 * return document at index position
 	 * Fdl.SearchDocument::search()
-	 * 
-	 * @return {Fdl.Document} document 
+	 *
+	 * @return {Fdl.Document} document
 	 */
 	getDocument : function(index) {
-		
+
 			if (typeof this.content[index] == 'object') {
 				return (this.context.getDocument( {
 					data : this.content[index]
 				}));
 			}
-		
+
 		return null;
 	},
 	/**
 	 * return total count of folder content or search result
-	 * 
+	 *
 	 * @return {Numeric} number of documents found
 	 */
 	count : function() {
 		return this.totalCount;
 	},
-	
+
 	toString : function() {
 		return 'Fdl.DocumentList';
 	}
@@ -3620,7 +3641,7 @@ Fdl.DocumentList.prototype = {
 
 /**
  * @class Fdl.Collection ; The collection document object
- * 
+ *
  * <pre><code>
   var C = new Fdl.Context( {
   	url : 'http://my.freedom/'
@@ -3646,7 +3667,7 @@ Fdl.DocumentList.prototype = {
   	}
   }
  * </code></pre>
- * 
+ *
  * @namespace Fdl.Document
  * @extends Fdl.Document
  * @param {Object}   config
@@ -3662,7 +3683,7 @@ Fdl.Collection.prototype.toString= function() {
 
 /**
  * return array of documents included in folder or result of a search
- * 
+ *
  * @param {Object}
  *            config
  *            <ul>

@@ -1,9 +1,10 @@
 Components.utils.import("resource://modules/getText.jsm");
 Components.utils.import("resource://modules/logger.jsm");
+Components.utils.import("resource://modules/docManager.jsm");
 
 function initDialog() {
 
-    var result = window.arguments[0], reportPath, message = "", currentElement;
+    var result = window.arguments[0], reportPath, message = "", currentElement, localDocument, title;
 
     logConsole('endSync', result);
 
@@ -27,8 +28,16 @@ function initDialog() {
             if (result.description.message && result.description.message.detailStatus) {
                 document.getElementById("message").hidden = false;
                 for(currentElement in result.description.message.detailStatus) {
-                    if (result.description.message.detailStatus.hasOwnProperty(currentElement) && result.description.message.detailStatus[currentElement].statusMessage) {
-                        message += result.description.message.detailStatus[currentElement].statusMessage+"\n";
+                    if (result.description.message.detailStatus.hasOwnProperty(currentElement)
+                        && result.description.message.detailStatus[currentElement].statusMessage) {
+                        if (result.description.message.detailStatus[currentElement].localId) {
+                            localDocument = docManager.getLocalDocument({
+                                initid : result.description.message.detailStatus[currentElement].localId
+                            });
+                            title = localDocument.getTitle();
+                            message += title || "";
+                        }
+                        message += "\t"+result.description.message.detailStatus[currentElement].statusMessage+" : "+getText("synchronize.shouldEdit")+"\n";
                     }
                 }
                 document.getElementById("message").value = message;

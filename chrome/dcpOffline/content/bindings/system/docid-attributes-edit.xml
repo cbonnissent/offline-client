@@ -1,46 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE bindings [
-      <!ENTITY % leaf-attributes-bindingDTD SYSTEM "chrome://dcpoffline/locale/bindings/leaf-attributes-binding.dtd" >
-      <!ENTITY separator "&#160;:&#160;" >
-      <!ENTITY systemBindingsDirPath "chrome://dcpoffline/content/bindings/system" >
-      %leaf-attributes-bindingDTD;
-]>
+        <!ENTITY % leaf-attributes-bindingDTD SYSTEM "chrome://dcpoffline/locale/bindings/leaf-attributes-binding.dtd" >
+        <!ENTITY separator "&#160;:&#160;" >
+        <!ENTITY systemBindingsDirPath "chrome://dcpoffline/content/bindings/system" >
+        %leaf-attributes-bindingDTD;
+        ]>
 <bindings
-    id="docid-attributes-binding"
-    xmlns="http://www.mozilla.org/xbl"
-    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    xmlns:xbl="http://www.mozilla.org/xbl">
+        id="docid-attributes-binding"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:xbl="http://www.mozilla.org/xbl">
     <!-- docid attributes -->
     <binding
-        id="docid-attr-edit"
-        extends="&systemBindingsDirPath;/leaf-attributes-edit.xml#leaf-attr-edit">
+            id="docid-attr-edit"
+            extends="&systemBindingsDirPath;/leaf-attributes-edit.xml#leaf-attr-edit">
         <content>
             <xul:hbox
-                xbl:inherits="attrid,collapsed"
-                flex="1"
-                class="dcpAttribute docid">
+                    xbl:inherits="attrid,collapsed"
+                    flex="1"
+                    class="dcpAttribute docid">
 
                 <xul:dcpAttributeLabel
-                    anonid="attrLabel"
-                    xbl:inherits="mode,required,value=label" />
+                        anonid="attrLabel"
+                        xbl:inherits="mode,required,value=label"/>
                 <xul:menulist
-                    xbl:inherits="disabled"
-                    editable="false"
-                    disableautoselect="true"
-                    sizetopopup = "none"
-                    anonid="displayValue"
-                    class="dcpValue">
+                        xbl:inherits="disabled"
+                        editable="false"
+                        disableautoselect="true"
+                        sizetopopup="none"
+                        anonid="displayValue"
+                        crop="start"
+                        class="dcpValue">
                     <xul:menupopup
-                        anonid="queryList"
-                        datasources="profile:storage.sqlite"
-                        ref="*"
-                        querytype="storage">
+                            anonid="queryList"
+                            datasources="profile:storage.sqlite"
+                            ref="*"
+                            querytype="storage">
                         <xul:menuitem
-                            anonid="choose"
-                            value=""
-                            class="dcpChooseDocid"
-                            label="&attribute.docid.noDocumentSet;" />
+                                anonid="choose"
+                                value=""
+
+                                class="dcpChooseDocid"
+                                label="&attribute.docid.noDocumentSet;"/>
                     </xul:menupopup>
                 </xul:menulist>
             </xul:hbox>
@@ -49,358 +51,343 @@
         <implementation>
 
             <constructor><![CDATA[
-                    var ml=this.getChild('choose');
-                    if (ml) {
-                        var relFamId=this.getAttribute('relationFamily');
-                        if (relFamId) {
-                            /*
-                            var fTitle=docManager.getFamilyTitle({name:relFamId});
-                            if (fTitle && fTitle != 'no family title') {
-                                var translate = new StringBundle(
-                                        "chrome://dcpoffline/locale/bindings/leaf-attributes-binding.properties");
-                                var message = translate.get('attr.docid.choose', [fTitle]);
-                                ml.setAttribute('label', message);
-                            }
-                */
-                        }
-                    }
-            ]]></constructor>
+                ]]></constructor>
             <field name="inputField"><![CDATA[
                 this.getChild('displayValue');
-            ]]></field>
+                ]]></field>
 
             <property
-                name="queryTemplate"
-                readonly="true">
+                    name="queryTemplate"
+                    readonly="true">
                 <getter><![CDATA[
-                    var query = this.queryQuery;
-                    var params = this.queryParams;
-                    var action = this.queryAction;
-                    
-                    var template = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "template");
-                    
-                    query.appendChild(params);
-                    
-                    template.appendChild(query);
-                    
-                    template.appendChild(action);
-                    
-                    return template;
-                ]]></getter>
+                        var query = this.queryQuery;
+                        var params = this.queryParams;
+                        var action = this.queryAction;
+
+                        var template = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "template");
+
+                        query.appendChild(params);
+
+                        template.appendChild(query);
+
+                        template.appendChild(action);
+
+                        return template;
+                    ]]></getter>
             </property>
 
             <property
-                name="queryQuery"
-                readonly="true">
+                    name="queryQuery"
+                    readonly="true">
                 <getter><![CDATA[
-                    var query = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "query");
-                    query.textContent = "SELECT initid, title"
-                            + " FROM doctitles"
-                            + " WHERE famname = :famid and initid like :filterid order by title";
-                    return query;
-                ]]></getter>
+                        var query = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "query");
+                        query.textContent = "SELECT initid, title"
+                                + " FROM doctitles"
+                                + " WHERE famname = :famid and initid like :filterid order by title";
+                        return query;
+                    ]]></getter>
             </property>
 
             <property
-                name="queryParams"
-                readonly="true">
+                    name="queryParams"
+                    readonly="true">
                 <getter><![CDATA[
-                    var paramsFragment = document.createDocumentFragment();
-                    var params = this.queryParamsList;
-                    params.forEach(function(paramId){
-                        var param = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "param");
-                        param.setAttribute('anonid', paramId);
-                        param.setAttribute('name', paramId);
-                        paramsFragment.appendChild(param);
-                    });
-                    return paramsFragment;
-                ]]></getter>
+                        var paramsFragment = document.createDocumentFragment();
+                        var params = this.queryParamsList;
+                        params.forEach(function (paramId) {
+                            var param = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "param");
+                            param.setAttribute('anonid', paramId);
+                            param.setAttribute('name', paramId);
+                            paramsFragment.appendChild(param);
+                        });
+                        return paramsFragment;
+                    ]]></getter>
             </property>
 
             <property
-                name="queryParamsList"
-                readonly="true">
+                    name="queryParamsList"
+                    readonly="true">
                 <getter><![CDATA[
-                    return ['famid', 'filterid'];
-                ]]></getter>
+                        return ['famid', 'filterid'];
+                    ]]></getter>
             </property>
 
             <property
-                name="queryAction"
-                readonly="true">
+                    name="queryAction"
+                    readonly="true">
                 <getter><![CDATA[
-                    var action = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "action");
-                    
-                    var menuItem = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menuitem");
-                    menuItem.setAttribute('uri', '?');
-                    menuItem.setAttribute('value', '?initid');
-                    menuItem.setAttribute('label', '?title');
-                    
-                    action.appendChild(menuItem);
-                    
-                    return action;
-                ]]></getter>
+                        var action = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "action");
+
+                        var menuItem = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menuitem");
+                        menuItem.setAttribute('crop', 'start');
+                        menuItem.setAttribute('uri', '?');
+                        menuItem.setAttribute('value', '?initid');
+                        menuItem.setAttribute('label', '?title');
+
+                        action.appendChild(menuItem);
+
+                        return action;
+                    ]]></getter>
             </property>
 
             <method name="fillParameters">
-                <parameter name="value" />
+                <parameter name="value"/>
                 <body><![CDATA[
-                    var needRebuild = false;
-                    if( (value === undefined) || (value === null) ){
-                        needRebuild = true;
-                        value = '%';
-                    }
-                    var relationFamily = this.getAttribute('relationFamily');
-                    var famidParam = this.getChild('famid');
-                    var filteridParam = this.getChild('filterid');
-                    
-                    if( famidParam.textContent != relationFamily ){
-                        famidParam.textContent = relationFamily;
-                        needRebuild = true;
-                    }
-                    
-                    if( filteridParam.textContent != value ){
-                        filteridParam.textContent = value;
-                        needRebuild = true;
-                    }
-                    return needRebuild;
-                ]]></body>
+                        var needRebuild = false;
+                        if ((value === undefined) || (value === null)) {
+                            needRebuild = true;
+                            value = '%';
+                        }
+                        var relationFamily = this.getAttribute('relationFamily');
+                        var famidParam = this.getChild('famid');
+                        var filteridParam = this.getChild('filterid');
+
+                        if (famidParam.textContent != relationFamily) {
+                            famidParam.textContent = relationFamily;
+                            needRebuild = true;
+                        }
+
+                        if (filteridParam.textContent != value) {
+                            filteridParam.textContent = value;
+                            needRebuild = true;
+                        }
+                        return needRebuild;
+                    ]]></body>
             </method>
 
             <method name="reloadValue">
                 <body><![CDATA[
-                    if( !this.constructed ){
-                        this.getChild('queryList').appendChild(this.queryTemplate);
-                        this.constructed = true;
-                    }
-                    
-                    var value = this.getDocId() || this.getValue();
-                    
-                    if( this.fillParameters(value) ){
-                        this.getChild('displayValue').menupopup.builder.rebuild();
-                    }
-                    
-                    var menuList = this.getChild('displayValue');
-                    var nbItems = menuList.itemCount;
-                    for(var i = 0; i < nbItems; i++) {
-                        var item = menuList.getItemAtIndex(i);
-                        if( (item.localName == 'menuitem') && (item.value == value) ){
-                            menuList.selectedIndex = i;
-                            break;
+                        if (!this.constructed) {
+                            this.getChild('queryList').appendChild(this.queryTemplate);
+                            this.constructed = true;
                         }
-                    }
-                    var icon=null;
-                    
-                    if(value && !Array.isArray(value)){
-                        var sdoc=docManager.getLocalDocument({initid:value});
-                        if (! sdoc) sdoc=docManager.getLocalDocument({name:this.getAttribute('relationFamily')});
-                        if (sdoc) {
-                            icon=sdoc.getIcon();
+
+                        var value = this.getDocId() || this.getValue();
+
+                        if (this.fillParameters(value)) {
+                            this.getChild('displayValue').menupopup.builder.rebuild();
                         }
-                        if (icon) {
-                            menuList.image='file://'+icon;
+
+                        var menuList = this.getChild('displayValue');
+                        var nbItems = menuList.itemCount;
+                        for (var i = 0; i < nbItems; i++) {
+                            var item = menuList.getItemAtIndex(i);
+                            if ((item.localName == 'menuitem') && (item.value == value)) {
+                                menuList.selectedIndex = i;
+                                break;
+                            }
                         }
-                    }
-                ]]></body>
+                        var icon = null;
+
+                        if (value && !Array.isArray(value)) {
+                            var sdoc = docManager.getLocalDocument({initid : value});
+                            if (!sdoc) sdoc = docManager.getLocalDocument({name : this.getAttribute('relationFamily')});
+                            if (sdoc) {
+                                icon = sdoc.getIcon();
+                            }
+                            if (icon) {
+                                menuList.image = 'file://' + icon;
+                            }
+                        }
+                    ]]></body>
             </method>
 
             <method name="unSelect">
                 <body><![CDATA[
-                    var menuList = this.getChild('displayValue');
-                    menuList.selectedIndex=0;
-                ]]></body>
+                        var menuList = this.getChild('displayValue');
+                        menuList.selectedIndex = 0;
+                    ]]></body>
             </method>
 
             <method name="getDocId">
                 <body><![CDATA[
-                    var menuList = this.getChild('displayValue');
-                    return menuList.value;
-                ]]></body>
+                        var menuList = this.getChild('displayValue');
+                        return menuList.value;
+                    ]]></body>
             </method>
 
             <method name="getDocTitle">
                 <body><![CDATA[
-                    var menuList = this.getChild('displayValue');
-                    return menuList.label;
-                ]]></body>
+                        var menuList = this.getChild('displayValue');
+                        return menuList.label;
+                    ]]></body>
             </method>
 
         </implementation>
 
         <handlers>
             <handler event="command"><![CDATA[
-                if (this.getAttribute("noset") != "true") {
-                    this.setValue(this.getDocId());
-                } else {
-                    this.reloadValue();
-                }
-            ]]></handler>
+                    if (this.getAttribute("noset") != "true") {
+                        this.setValue(this.getDocId());
+                    } else {
+                        this.reloadValue();
+                    }
+                ]]></handler>
 
             <handler event="popupshowing"><![CDATA[
-                if( !this.constructed ){
-                    this.getChild('queryList').appendChild(this.queryTemplate);
-                    this.constructed = true;
-                }
-                    
-                this.fillParameters();
-                this.getChild('displayValue').menupopup.builder.rebuild();
-            ]]></handler>
+                    if (!this.constructed) {
+                        this.getChild('queryList').appendChild(this.queryTemplate);
+                        this.constructed = true;
+                    }
+
+                    this.fillParameters();
+                    this.getChild('displayValue').menupopup.builder.rebuild();
+                ]]></handler>
         </handlers>
 
     </binding>
 
     <binding
-        id="docid-multiple-attr-edit"
-        extends="&systemBindingsDirPath;/leaf-attributes-edit.xml#leaf-attr-edit">
+            id="docid-multiple-attr-edit"
+            extends="&systemBindingsDirPath;/leaf-attributes-edit.xml#leaf-attr-edit">
         <content>
             <xul:hbox
-                xbl:inherits="attrid,collapsed"
-                flex="1"
-                class="dcpAttribute docid">
+                    xbl:inherits="attrid,collapsed"
+                    flex="1"
+                    class="dcpAttribute docid">
                 <xul:dcpAttributeLabel
-                    anonid="attrLabel"
-                    xbl:inherits="value=label" />
+                        anonid="attrLabel"
+                        xbl:inherits="value=label"/>
                 <xul:hbox>
                     <xul:vbox>
                         <xul:listbox
-                            xbl:inherits="disabled"
-                            anonid="multiBox"
-                            flex="1"
-                            seltype="multiple">
+                                xbl:inherits="disabled"
+                                anonid="multiBox"
+                                flex="1"
+                                seltype="multiple">
                         </xul:listbox>
                         <xul:dcpAttribute
-                            anonid="selector"
-                            xbl:inherits="attrid,label,relationFamily,visibility,type,disabled"
-                            nolabel="true"
-                            noset="true"
-                            multiple="false" />
+                                anonid="selector"
+                                xbl:inherits="attrid,label,relationFamily,visibility,type,disabled"
+                                nolabel="true"
+                                noset="true"
+                                multiple="false"/>
                     </xul:vbox>
                     <xul:button
-                        anonid="clearSelection"
-                        disabled="true"
-                        label="Clear selection" />
+                            anonid="clearSelection"
+                            disabled="true"
+                            label="Clear selection"/>
                 </xul:hbox>
             </xul:hbox>
         </content>
         <implementation>
             <field name="selector"><![CDATA[
                 this.getChild('displayValue');
-            ]]></field>
+                ]]></field>
             <field name="clearSelection"><![CDATA[
                 this.getChild('clearSelection');
-            ]]></field>
+                ]]></field>
             <field name="multiBox"><![CDATA[
                 this.getChild('multiBox');
-            ]]></field>
+                ]]></field>
             <method name="reloadValue">
                 <body><![CDATA[
-                    Components.utils.import("resource://modules/formater.jsm");
-            
-            var docids=this.getDocIds();
-            var olistbox=this.multiBox;
-            while (olistbox.getRowCount() > 0) {
-                olistbox.removeItemAt(0);
-            }
-            var ltitle;
-            for (var i=0;i< docids.length;i++) {
-                ltitle=formater.getDocumentTitle({initid:docids[i]});
-                olistbox.appendItem(ltitle, docids[i]);
-            }
-            olistbox.setAttribute('rows', docids.length);
-                ]]></body>
+                        Components.utils.import("resource://modules/formater.jsm");
+
+                        var docids = this.getDocIds();
+                        var olistbox = this.multiBox;
+                        while (olistbox.getRowCount() > 0) {
+                            olistbox.removeItemAt(0);
+                        }
+                        var ltitle;
+                        for (var i = 0; i < docids.length; i++) {
+                            ltitle = formater.getDocumentTitle({initid : docids[i]});
+                            olistbox.appendItem(ltitle, docids[i]);
+                        }
+                        olistbox.setAttribute('rows', docids.length);
+                    ]]></body>
             </method>
             <method name="getDocIds">
                 <body><![CDATA[
-                    return this.getValue();
-                ]]></body>
+                        return this.getValue();
+                    ]]></body>
             </method>
             <method name="getValues">
                 <body><![CDATA[
-                       var values=[];
-                       var olistbox=this.multiBox;
-                       var nbRows=olistbox.getRowCount();
-                       for (var i=0;i<nbRows;i++) {
-                          if (olistbox.getItemAtIndex(i).value) {
-                            values.push(olistbox.getItemAtIndex(i).value);
+                        var values = [];
+                        var olistbox = this.multiBox;
+                        var nbRows = olistbox.getRowCount();
+                        for (var i = 0; i < nbRows; i++) {
+                            if (olistbox.getItemAtIndex(i).value) {
+                                values.push(olistbox.getItemAtIndex(i).value);
                             }
-                       }
-                       return values;
-                ]]></body>
+                        }
+                        return values;
+                    ]]></body>
             </method>
         </implementation>
         <handlers>
             <handler event="change"><![CDATA[
-                alert('change');
-            ]]></handler>
+                    alert('change');
+                ]]></handler>
             <handler
-                event="click"
-                button="0"><![CDATA[
-                if(event.originalTarget == this.clearSelection){
-                  
-                    
-                    var olistbox=this.multiBox;
-                    
-                    var sel=this.getChild('selector');
-                    sel.unSelect();
-                    var sels=olistbox.selectedItems;
-                    while (olistbox.selectedItems.length > 0) {
-                       olistbox.removeItemAt(olistbox.getIndexOfItem(olistbox.selectedItems[0]));
+                    event="click"
+                    button="0"><![CDATA[
+                    if (event.originalTarget == this.clearSelection) {
+
+                        var olistbox = this.multiBox;
+
+                        var sel = this.getChild('selector');
+                        sel.unSelect();
+                        var sels = olistbox.selectedItems;
+                        while (olistbox.selectedItems.length > 0) {
+                            olistbox.removeItemAt(olistbox.getIndexOfItem(olistbox.selectedItems[0]));
+                        }
+                        this.setValue(this.getValues());
                     }
-                    this.setValue(this.getValues());
-                }
-            ]]></handler>
+                ]]></handler>
             <handler event="select"><![CDATA[
-                if(event.originalTarget == this.multiBox){
-                   var nbRows=this.multiBox.selectedCount;
-                   if (nbRows > 0) {
-                     this.clearSelection.disabled=false;
-                   } else {
-                     this.clearSelection.disabled=true;
-                   }
-                }
-            ]]></handler>
-            <handler event="command"><![CDATA[
-               var sel=this.getChild('selector');
-               var newDocumentId=sel.getDocId();
-               
-               if (newDocumentId > 0) {
-                   var olistbox=this.getChild("multiBox");
-                   var nbRows=olistbox.getRowCount();
-                   var isAlreadySet=false;
-                   for (var i=0;i<nbRows;i++) {
-                      if (olistbox.getItemAtIndex(i).value == newDocumentId) {
-                        isAlreadySet=true;
-                        break;
-                      }
-                   }
-                   if (! isAlreadySet) {
-                   
-                       var newtitle=sel.getDocTitle();
-           
-                       var values=this.getValues();
-                       values.push(newDocumentId);
-                      
-                       this.setValue(values);
+                    if (event.originalTarget == this.multiBox) {
+                        var nbRows = this.multiBox.selectedCount;
+                        if (nbRows > 0) {
+                            this.clearSelection.disabled = false;
+                        } else {
+                            this.clearSelection.disabled = true;
+                        }
                     }
-                }
-            ]]></handler>
+                ]]></handler>
+            <handler event="command"><![CDATA[
+                    var sel = this.getChild('selector');
+                    var newDocumentId = sel.getDocId();
+
+                    if (newDocumentId > 0) {
+                        var olistbox = this.getChild("multiBox");
+                        var nbRows = olistbox.getRowCount();
+                        var isAlreadySet = false;
+                        for (var i = 0; i < nbRows; i++) {
+                            if (olistbox.getItemAtIndex(i).value == newDocumentId) {
+                                isAlreadySet = true;
+                                break;
+                            }
+                        }
+                        if (!isAlreadySet) {
+
+                            var newtitle = sel.getDocTitle();
+
+                            var values = this.getValues();
+                            values.push(newDocumentId);
+
+                            this.setValue(values);
+                        }
+                    }
+                ]]></handler>
         </handlers>
     </binding>
     <binding
-        id="docid-multiple2-attr-edit"
-        extends="&systemBindingsDirPath;/docid-attributes-edit.xml#docid-multiple-attr-edit">
+            id="docid-multiple2-attr-edit"
+            extends="&systemBindingsDirPath;/docid-attributes-edit.xml#docid-multiple-attr-edit">
         <implementation>
             <method name="getDocIds">
                 <body><![CDATA[
-                if (! this.getValue()) return '';
-                    return this.getValue().split('<BR>');
-                ]]></body>
+                        if (!this.getValue()) return '';
+                        return this.getValue().split('<BR>');
+                    ]]></body>
             </method>
             <method name="checkValue">
-                <parameter name="value" />
+                <parameter name="value"/>
                 <body><![CDATA[
-                    return value.join('<BR>');
-                ]]></body>
+                        return value.join('<BR>');
+                    ]]></body>
             </method>
         </implementation>
     </binding>
