@@ -582,7 +582,7 @@ function cleanFileSync(config) {
 }
 function saveAFile(config, callback) {
 
-    var error;
+    var error, index, conf;
 
     if (config && config.initid && config.attrid && config.basename
         && config.aFile) {
@@ -593,6 +593,8 @@ function saveAFile(config, callback) {
             if (!config.hasOwnProperty('index')) {
                 config.index = -1;
             }
+
+            index = config.index;
 
             var destDir = null;
             try {
@@ -638,6 +640,7 @@ function saveAFile(config, callback) {
                 config.aFile.permissions = config.writable
                     ? PERMISSIONS_WRITABLE
                     : PERMISSIONS_NOT_WRITABLE;
+                config.index = index;
                 // set ref in database
                 storeFile(config);
                 if ((config.uuid) && (config.attrid != 'icon')) {
@@ -646,10 +649,15 @@ function saveAFile(config, callback) {
                     });
                     if (localDoc) {
                         localDoc.setValue(config.attrid, config.uuid, config.index);
-                        localDoc.save({
+                        conf = {
                             force :              true,
                             noModificationDate : true
-                        });
+                        };
+                        if (localDoc.inMemoryDoc) {
+                            localDoc.store(conf);
+                        } else {
+                            localDoc.save(conf);
+                        }
                     }
                 }
                 if (callback && callback.onSuccess) {
