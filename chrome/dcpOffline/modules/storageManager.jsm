@@ -567,6 +567,9 @@ var storageManager = {
                                             if (Array.isArray(currentValue)) {
                                                 currentValue = currentValue.join("<BR>");
                                             }
+                                            if (mapAttribute.type === "longtext") {
+                                                currentValue = currentValue.replace("<BR>", "\n");
+                                            }
                                             return currentValue;
                                         });
                                         value = JSON.stringify(value);
