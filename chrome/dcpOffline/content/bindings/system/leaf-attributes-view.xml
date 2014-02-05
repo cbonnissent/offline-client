@@ -480,14 +480,14 @@
                     var docids = this.getValue(), cloneNode, currentElements, currentBinding = this,
                             rows = this.getChild('rows'), j;
                     if (Array.isArray(docids)) {
-                        //sic doesn't know why this happen
+                        //logConsole("sic doesn't know why this happen");
                         return;
                     }
                     currentElements = docids.split("<BR>");
                     for (j = 0; j < currentElements.length; j++) {
                         cloneNode = currentBinding.cloneNode(false);
                         cloneNode.setAttribute("multiple", "false");
-                        cloneNode.setAttribute("index", 0);
+                        cloneNode.setAttribute("index", this.index);
                         cloneNode.setAttribute("docid", currentElements[j]);
                         rows.appendChild(cloneNode);
                     }
