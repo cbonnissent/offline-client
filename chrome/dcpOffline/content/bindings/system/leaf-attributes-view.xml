@@ -384,7 +384,7 @@
                     Components.utils.import("resource://modules/docManager.jsm");
                     var valueNode = this.getChild('displayValue');
 
-                    var docid = this.docid
+                    var docid = this.docid;
 
                     if (docid && !(Array.isArray(docid))) {
                         var title = formater.getDocumentTitle({initid : docid});
@@ -477,17 +477,19 @@
             <constructor><![CDATA[
                     Components.utils.import("resource://modules/formater.jsm");
 
-                    var docids = this.getValue(), clo;
-                    if (!Array.isArray(docids)) {
-                        docids = docids.split('<BR>');
+                    var docids = this.getValue(), cloneNode, currentElements, currentBinding = this,
+                        rows = this.getChild('rows'), j;
+                    if (Array.isArray(docids)) {
+                        return;
                     }
-                    var rows = this.getChild('rows');
-                    for (var i = 0; i < docids.length; i++) {
-                        clo = this.cloneNode(false);
-                        clo.setAttribute("multiple", "false");
-                        clo.setAttribute("index", i);
-                        clo.setAttribute("docid", docids[i]);
-                        rows.appendChild(clo);
+                    currentElements = docids.split("<BR>");
+                    logConsole("currentElements", currentElements);
+                    for (j = 0; j < currentElements.length; j++) {
+                        cloneNode = currentBinding.cloneNode(false);
+                        cloneNode.setAttribute("multiple", "false");
+                        cloneNode.setAttribute("index", 0);
+                        cloneNode.setAttribute("docid", currentElements[j]);
+                        rows.appendChild(cloneNode);
                     }
                 ]]>
             </constructor>
