@@ -67,6 +67,9 @@
             <method name="setValue">
                 <parameter name="value" />
                 <body><![CDATA[
+                    if (!this.attrid) {
+                        return true;
+                    }
                     try{
                         if(! this._isSettingValue){
                             this._isSettingValue = true;

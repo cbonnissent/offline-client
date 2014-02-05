@@ -93,6 +93,7 @@ dcpAttribute[type=timestamp],
 dcpAttribute[type=date],
 dcpAttribute[type=time],
 dcpAttribute[type=docid],
+dcpAttribute[type=account],
 dcpAttribute[type=enum],
 dcpAttribute[type=file],
 dcpAttribute[type=image] {
@@ -212,7 +213,9 @@ dcpAttribute[type=enum] grid .dcpSeparator,
 dcpAttribute[type=array] grid .dcpLabel,
 dcpAttribute[type=array] grid .dcpSeparator,
 dcpAttribute[type=docid] grid .dcpLabel,
-dcpAttribute[type=docid] grid .dcpSeparator {
+dcpAttribute[type=docid] grid .dcpSeparator,
+dcpAttribute[type=account] grid .dcpLabel,
+dcpAttribute[type=account] grid .dcpSeparator {
     visibility: collapse;
 }
 

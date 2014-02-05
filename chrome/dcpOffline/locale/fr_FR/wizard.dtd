@@ -12,7 +12,7 @@ accessible. En cas de doute, contactez votre administrateur.
  Pour commencer, utilisez le bouton ci-dessous...">
 <!ENTITY wizard.initialization.domain               "Initialisation du Domaine">
 <!ENTITY wizard.first.login                         "Première connexion">
-<!ENTITY wizard.try.authent                         "cliquez ici pour tester la connexion...">
+<!ENTITY wizard.try.authent                         "Cliquez ici pour tester la connexion">
 <!ENTITY wizard.initialization.selectDomain         "Sélectionnez le domaine à utiliser">
-<!ENTITY wizard.try.synchronize                     "Lancer le test de synchronisation...">
-<!ENTITY wizard.initialization.end                    "Votre client est maintenant initialisé. Vous pouvez commencer à l'utiliser dès maintenant.">
+<!ENTITY wizard.try.synchronize                     "Lancer la synchronisation initiale">
+<!ENTITY wizard.initialization.end                  "Votre client est maintenant initialisé. Vous pouvez commencer à l'utiliser dès maintenant.">

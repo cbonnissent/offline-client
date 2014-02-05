@@ -340,8 +340,8 @@ var storageManager = {
                         attributesMapping.push({
                             columnId    : columnId,
                             attrId      : attribute.id,
-                            istitle     :  attribute.inTitle,
-                            isabstract  :  attribute.inAbstract,
+                            istitle     : attribute.inTitle,
+                            isabstract  : attribute.inAbstract,
                             ismultiple  : attribute.inArray() || (attribute.getOption('multiple')==='yes'),
                             isproperty  : false,
                             label       : attribute.getLabel(),
@@ -429,51 +429,6 @@ var storageManager = {
                     logError(e);
                     throw(e);
                 }
-/*
-                viewName = family.getProperty('name') + VIEWS_PROPERTIES_SUFFIX;
-                
-                var viewPropertiesQuery = 'CREATE VIEW ' + viewName
-                        + ' AS SELECT ' + viewPropertiesQuerySelect.join(', ')
-                        + ' FROM ' + TABLES_DOCUMENTS
-                        + ' WHERE ' + viewQueryWhere;
-                
-                try{
-                    this.execQuery({
-                        query : "DROP VIEW IF EXISTS " + viewName
-                    });
-                    this.execQuery({
-                        query : viewPropertiesQuery
-                    });
-                } catch(e){
-                    logError('storageManager::initFamilyView (properties view creation)');
-                    logError(e);
-                    throw(e);
-                }
-*/
-                /*
-                viewName = family.getProperty('name') + VIEWS_ATTRIBUTES_SUFFIX;
-
-                // we add initid to the list of selected attributes
-                // to ensure you can still join when using views
-                viewAttributesQuerySelect.push('initid as initid');
-                var viewAttributesQuery = 'CREATE VIEW ' + viewName
-                        + ' AS SELECT ' + viewAttributesQuerySelect.join(', ')
-                        + ' FROM ' + TABLES_DOCUMENTS
-                        + ' WHERE ' + viewQueryWhere;
-                
-                try{
-                    this.execQuery({
-                        query : "DROP VIEW IF EXISTS " + viewName
-                    });
-                    this.execQuery({
-                        query : viewAttributesQuery
-                    });
-                } catch(e){
-                    logError('storageManager::initFamilyView (attributes view creation)');
-                    logError(e);
-                    throw(e);
-                }
-*/
                 // at the end, we insert the mappings in TABLES_MAPPING
                 var mappingQuery = "INSERT INTO " + TABLES_MAPPING
                         + " (famid, attrid, columnid, ismultiple, isabstract, istitle, isproperty, type, label)"
@@ -582,11 +537,11 @@ var storageManager = {
                     var mapping = getAttrMapping({
                         fromid: fromid
                     });
-                    
+
                     var params = {};
                     var columns = [];
                     for( let propertyId in properties ){
-                        
+
                         var value = properties[propertyId];
                         if (value && (Array.isArray(value) || typeof value=='object')) {
                             value = JSON.stringify(value);
@@ -598,21 +553,27 @@ var storageManager = {
                             throw "duplicate property ["+propertyId+ "when save ";
                         }
                     }
-                    
+
                     for( let attrId in attributes ){
                         var value = attributes[attrId];
                         var mapAttribute = mapping.attributes[attrId];
                         if(mapAttribute){
                             //ignore "virtual" attributes (like *_title, for example)
-                            
+
                             if( mapAttribute.ismultiple ){
-                            	if (value) {
-                                if(Array.isArray(value)){
-                                    value = JSON.stringify(value);
-                                } else {
-                                    throw "value '+JSON.stringify(value)+' is not an array for " + attrId + " which is marked as multiple";
+                                if (value) {
+                                    if(Array.isArray(value)){
+                                        value = value.map(function(currentValue) {
+                                            if (Array.isArray(currentValue)) {
+                                                currentValue = currentValue.join("<BR>");
+                                            }
+                                            return currentValue;
+                                        });
+                                        value = JSON.stringify(value);
+                                    } else {
+                                        throw "value "+JSON.stringify(value)+" is not an array for " + attrId + " which is marked as multiple";
+                                    }
                                 }
-                            	}
                             } else {
                                 switch( mapAttribute.type ){
                                     // XXX add specific attributes pre-save
@@ -625,6 +586,7 @@ var storageManager = {
                                     case 'file' :
                                     case 'enum' :
                                     case 'thesaurus' :
+                                    case 'account' :
                                     case 'docid' :
                                     case 'timestamp' :
                                     case 'date' :
@@ -646,13 +608,13 @@ var storageManager = {
                             }
                         }
                     }
-                    
+
                     config.query = "INSERT INTO " + TABLES_DOCUMENTS
                             + "(" + columns.join(', ') + ")"
                             + " VALUES (:" + columns.join(', :') + ")";
                     config.params = params;
-                
-                    
+
+
                     return this.execQuery(config);
                 } catch(e){
                     logError('storageManager::saveDocumentValues');

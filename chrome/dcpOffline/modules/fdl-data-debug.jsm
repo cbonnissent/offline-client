@@ -2598,6 +2598,7 @@ Fdl.Document.prototype = {
     	var oa=this.getAttribute(id);
     	var i=0,vs=null,tv=[];
     	if (oa) {
+            if (oa.toString() == 'Fdl.AccountAttribute') return Fdl.encodeHtmlTags(this.getValue(id + '_title', this._data.values[id]));
     		if (oa.toString() == 'Fdl.RelationAttribute') return Fdl.encodeHtmlTags(this.getValue(id+'_title',this._data.values[id]));
     		if (oa.toString() == 'Fdl.ThesaurusAttribute') return Fdl.encodeHtmlTags(this.getValue(id+'_title',this._data.values[id]));
     		if (oa.toString() == 'Fdl.EnumAttribute') {
@@ -2877,6 +2878,9 @@ Fdl.Document.prototype.completeAttributes = function(attrs) {
 			case 'time':
 			case 'timestamp':
 				this._attributes[attrs[name].id]=new Fdl.DateAttribute(attrs[name]);
+				break;
+			case 'account':
+				this._attributes[attrs[name].id] = new Fdl.AccountAttribute(attrs[name]);
 				break;
 			case 'docid':
 				this._attributes[attrs[name].id]=new Fdl.RelationAttribute(attrs[name]);
@@ -5349,6 +5353,27 @@ Fdl.RelationAttribute = function(config) {
 Fdl.RelationAttribute.prototype = new Fdl.LeafAttribute();
 Fdl.RelationAttribute.prototype.toString = function() {
 	return 'Fdl.RelationAttribute';
+};
+/**
+ * @class Fdl.RelationAttribute Relation Attribute class
+ * @extends Fdl.LeafAttribute
+ * @namespace Fdl.Attribute
+ * @param {Object}
+ *            config
+ */
+Fdl.AccountAttribute = function (config) {
+    Fdl.RelationAttribute.call(this, config);
+    if (this._data) {
+        this.relationFamilyId = this._data.format || "IUSER";
+    }
+    if (config && config.relationFamilyId) {
+        this.relationFamilyId = config.relationFamilyId;
+    }
+};
+
+Fdl.AccountAttribute.prototype = new Fdl.RelationAttribute();
+Fdl.AccountAttribute.prototype.toString = function () {
+    return 'Fdl.AccountAttribute';
 };
 /**
  * return title of document relation

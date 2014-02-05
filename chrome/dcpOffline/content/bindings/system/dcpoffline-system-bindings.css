@@ -203,7 +203,18 @@ dcpDocument dcpAttribute[type=docid][multiple=true],dcpDocument[mode=view] dcpAt
     -moz-binding:
         url("chrome://dcpoffline/content/bindings/system/leaf-attributes-view.xml#docid-multiple-attr-view");
 }
+/*Account*/
+dcpDocument dcpAttribute[type=account], dcpDocument[mode=view] dcpAttribute[type=account] {
+    -moz-binding: url("chrome://dcpoffline/content/bindings/system/leaf-attributes-view.xml#docid-attr-view");
+}
 
+dcpDocument[mode=view] dcpAttribute[type=array] dcpAttribute[type=account][multiple=true] {
+    -moz-binding: url("chrome://dcpoffline/content/bindings/system/leaf-attributes-view.xml#docid-multiple2-attr-view");
+}
+
+dcpDocument dcpAttribute[type=account][multiple=true], dcpDocument[mode=view] dcpAttribute[type=account][multiple=true] {
+    -moz-binding: url("chrome://dcpoffline/content/bindings/system/leaf-attributes-view.xml#docid-multiple-attr-view");
+}
 
 dcpDocument dcpAttribute[type=enum],dcpDocument[mode=view] dcpAttribute[type=enum]
     {
@@ -360,5 +371,17 @@ dcpDocument[mode=edit] dcpAttribute[type=docid][multiple=true] {
 dcpDocument[mode=edit] dcpAttribute[type=array] dcpAttribute[type=docid][multiple=true] {
     -moz-binding:
         url("chrome://dcpoffline/content/bindings/system/docid-attributes-edit.xml#docid-multiple2-attr-edit");
+}
+/*account*/
+dcpDocument[mode=edit] dcpAttribute[type=account][multiple=false] {
+    -moz-binding: url("chrome://dcpoffline/content/bindings/system/docid-attributes-edit.xml#docid-attr-edit");
+}
+
+dcpDocument[mode=edit] dcpAttribute[type=account][multiple=true] {
+    -moz-binding: url("chrome://dcpoffline/content/bindings/system/docid-attributes-edit.xml#docid-multiple-attr-edit");
+}
+
+dcpDocument[mode=edit] dcpAttribute[type=array] dcpAttribute[type=account][multiple=true] {
+    -moz-binding: url("chrome://dcpoffline/content/bindings/system/docid-attributes-edit.xml#docid-multiple2-attr-edit");
 }
 

@@ -10,7 +10,7 @@ Don't Panic ! Contact your IT administrator if you have any problem.
 First step, use the following button...">
 <!ENTITY wizard.initialization.domain               "Domain Initialisation">
 <!ENTITY wizard.first.login                         "First connection">
-<!ENTITY wizard.try.authent                         "Clic here to test your connection...">
+<!ENTITY wizard.try.authent                         "Clic here to test your connection">
 <!ENTITY wizard.initialization.selectDomain         "Select your domain">
-<!ENTITY wizard.try.synchronize                     "Start the first synchronisation test...">
-<!ENTITY wizard.initialization.end                    "Your client is initialized. You can use it.">
+<!ENTITY wizard.try.synchronize                     "Start the first synchronisation">
+<!ENTITY wizard.initialization.end                  "Your client is initialized. You can use it.">
