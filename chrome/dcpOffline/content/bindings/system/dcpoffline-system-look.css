@@ -93,6 +93,7 @@ dcpAttribute[type=timestamp],
 dcpAttribute[type=date],
 dcpAttribute[type=time],
 dcpAttribute[type=docid],
+dcpAttribute[type=account],
 dcpAttribute[type=enum],
 dcpAttribute[type=file],
 dcpAttribute[type=image] {

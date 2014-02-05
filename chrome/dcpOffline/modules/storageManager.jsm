@@ -563,6 +563,12 @@ var storageManager = {
                             if( mapAttribute.ismultiple ){
                                 if (value) {
                                     if(Array.isArray(value)){
+                                        value = value.map(function(currentValue) {
+                                            if (Array.isArray(currentValue)) {
+                                                currentValue = currentValue.join("<BR>");
+                                            }
+                                            return currentValue;
+                                        });
                                         value = JSON.stringify(value);
                                     } else {
                                         throw "value "+JSON.stringify(value)+" is not an array for " + attrId + " which is marked as multiple";

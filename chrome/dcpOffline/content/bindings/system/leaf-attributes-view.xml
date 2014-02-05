@@ -478,12 +478,12 @@
                     Components.utils.import("resource://modules/formater.jsm");
 
                     var docids = this.getValue(), cloneNode, currentElements, currentBinding = this,
-                        rows = this.getChild('rows'), j;
+                            rows = this.getChild('rows'), j;
                     if (Array.isArray(docids)) {
+                        //sic doesn't know why this happen
                         return;
                     }
                     currentElements = docids.split("<BR>");
-                    logConsole("currentElements", currentElements);
                     for (j = 0; j < currentElements.length; j++) {
                         cloneNode = currentBinding.cloneNode(false);
                         cloneNode.setAttribute("multiple", "false");
