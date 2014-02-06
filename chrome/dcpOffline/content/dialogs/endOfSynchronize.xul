@@ -54,7 +54,7 @@
                     </row>
                 </rows>
             </grid>
-            <iframe id="reportFrame" flex="1" width="600px"/>
+            <iframe id="reportFrame" flex="1" width="600px" height="150px"/>
             <textbox
                 id="message"
                 multiline="true"

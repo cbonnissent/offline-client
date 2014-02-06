@@ -55,7 +55,7 @@ function initDialog() {
     }
     reportPath = computeReportPath();
     if (reportPath) {
-        document.getElementById("reportFrame").setAttribute("src", "file://"+reportPath+'/#synchro-result');
+        document.getElementById("reportFrame").setAttribute("src", "file://"+reportPath+'/#showOnlyLastTransaction');
     }
 }
 
