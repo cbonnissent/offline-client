@@ -584,7 +584,7 @@ function cleanFileSync(config) {
 }
 function saveAFile(config, callback) {
 
-    var error;
+    var error, index;
 
     if (config && config.initid && config.attrid && config.basename
         && config.aFile) {
@@ -595,6 +595,8 @@ function saveAFile(config, callback) {
             if (!config.hasOwnProperty('index')) {
                 config.index = -1;
             }
+
+            index = config.index;
 
             var destDir = null;
             try {
@@ -641,6 +643,7 @@ function saveAFile(config, callback) {
                     ? PERMISSIONS_WRITABLE
                     : PERMISSIONS_NOT_WRITABLE;
                 // set ref in database
+                config.index = index;
                 storeFile(config);
                 if ((config.uuid) && (config.attrid != 'icon')) {
                     var localDoc = docManager.getLocalDocument({
