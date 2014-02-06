@@ -14,6 +14,7 @@ Components.utils.import("resource://modules/offlineSynchronize.jsm");
 Components.utils.import("resource://modules/docManager.jsm");
 
 function initSynchronize() {
+    window.synchroInProgress = false;
     isServerOK();
     addObserver();
     initPage();
