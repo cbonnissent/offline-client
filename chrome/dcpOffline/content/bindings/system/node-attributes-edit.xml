@@ -341,7 +341,7 @@
             <handler event="click" button="0"><![CDATA[
                 switch(event.originalTarget){
                     case this.getChild('button-add') :
-                        this.array.insertNewRow();
+                        this.array.insertNewRow(0);
                         break;
                 }
             ]]></handler>
@@ -393,7 +393,7 @@
                         this.array.deleteRow(this.index);
                         break;
                     case this.getChild('button-add') :
-                        this.array.insertNewRow(this.index);
+                        this.array.insertNewRow(parseInt(this.index, 10)+1);
                         break;
                 }
             ]]></handler>
