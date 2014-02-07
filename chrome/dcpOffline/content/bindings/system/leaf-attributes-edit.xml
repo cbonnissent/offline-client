@@ -693,27 +693,33 @@
 
             <method name="reloadValue">
                 <body><![CDATA[
-                    Components.utils.import("resource://modules/fileManager.jsm");
-                    try{
-                        var aFile = fileManager.getFile({
-                            initid:this.doc.getInitid(),
-                            attrid:this.attrid,
-                            index:this.index
-                        });
-                        if(aFile && aFile.exists()){
-                            Components.utils.import("resource://modules/formater.jsm");
-                            var aFileURI = formater.getURI({file: aFile});
-                            this.inputField.src = aFileURI.spec;
-                            this.inputField.tooltipText = aFile.leafName;
-                        } else {
-                            this.inputField.src = "";
-                            this.inputField.tooltipText = "";
+                        Components.utils.import("resource://modules/fileManager.jsm");
+                        var value = this.getValue(), aFile, toolTip, fileURI;
+
+                        if (value) {
+                            try {
+                                aFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+                                aFile.initWithPath(value);
+                            } catch (e) {
+                                aFile = fileManager.getFile({
+                                    initid : this.doc.getInitid(),
+                                    attrid : this.attrid,
+                                    index :  this.index
+                                });
+                            }
+                            if (aFile && aFile.exists()) {
+                                try {
+                                    fileURI = formater.getURI({file : aFile});
+                                    fileURI = fileURI.spec;
+                                    toolTip = aFile.leafName;
+                                } catch(e) {
+                                    logError(e);
+                                }
+                            }
                         }
-                    } catch(e) {
-                        this.inputField.src = "";
-                        this.inputField.tooltipText = "";
-                    }
-                ]]></body>
+                        this.inputField.src = fileURI;
+                        this.inputField.tooltipText = toolTip;
+                    ]]></body>
             </method>
 
         </implementation>
