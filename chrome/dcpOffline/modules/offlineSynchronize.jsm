@@ -526,7 +526,31 @@ offlineSynchronize.prototype.pushDocument = function (config) {
 offlineSynchronize.prototype.pullDocuments = function (config) {
     Components.utils.import("resource://modules/events.jsm");
     var onedoc, j = 0,
-        domain = config.domain, currentSync = this;
+        domain = config.domain, currentSync = this,
+        nbDoc = 0,
+        recordFiles = function() {
+            if (nbDoc > 0) {
+                nbDoc = nbDoc - 1;
+                return;
+            }
+            currentSync.recordFiles({
+                domain :    domain,
+                onSuccess : function () {
+                    currentSync.deleteDocuments({
+                        origin :     'user',
+                        domain :     domain,
+                        deleteList : domain.sync().getUserDocumentsToDelete()
+                    });
+                    applicationEvent.publish("postPullUserDocument");
+                    storageManager.lockDatabase({
+                        lock : false
+                    });
+                    if (config.onSuccess) {
+                        config.onSuccess();
+                    }
+                }
+            });
+        };
     if (config && config.domain) {
         // TODO pull all documents and modified files
         logConsole('Begin pull documents');
@@ -577,32 +601,19 @@ offlineSynchronize.prototype.pullDocuments = function (config) {
         if (userd) {
             this.callObserver('onDetailLabel', 'Recording user documents : ' + userd.length);
             logConsole('pull users : ' + userd.length);
+            nbDoc = userd.length;
             for (j = 0; j < userd.length; j++) {
                 onedoc = userd.getDocument(j);
                 this.recordDocument({
                     domain :   domain,
-                    document : onedoc
+                    document : onedoc,
+                    onSuccess : recordFiles
                 });
                 this.log('pull from user :' + onedoc.getTitle());
                 this.callObserver('onDetailPercent', (j + 1) / userd.length * 100);
             }
-            this.recordFiles({
-                domain : domain,
-                onSuccess: function() {
-                    currentSync.deleteDocuments({
-                        origin :     'user',
-                        domain :     domain,
-                        deleteList : domain.sync().getUserDocumentsToDelete()
-                    });
-                    applicationEvent.publish("postPullUserDocument");
-                    storageManager.lockDatabase({
-                        lock : false
-                    });
-                    if (config.onSuccess) {
-                        config.onSuccess();
-                    }
-                }
-            });
+            recordFiles();
+
         } else {
             throw new SyncException("pull documents failed");
         }
@@ -834,7 +845,7 @@ offlineSynchronize.prototype.updateEnumItems = function (config) {
 offlineSynchronize.prototype.deleteDocuments = function (config) {
 
     Components.utils.import("resource://modules/events.jsm");
-    var eventManager = applicationEvent, currentSync = this;
+    var eventManager = applicationEvent, currentSync = this, r;
     if (config && config.domain && config.origin && config.deleteList && (config.origin == 'user' || config.origin == 'shared')) {
 
         if (config.deleteList.length > 0) {
@@ -878,9 +889,21 @@ offlineSynchronize.prototype.deleteDocuments = function (config) {
             //logConsole("deleteDocuments", config.deleteList);
         } else {
             logConsole("clean delete documents / 1");
+            r = storageManager.execQuery({
+                query : "select * from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"
+            });
+            if (r.length) {
+                logConsole('****************suppress from domain******************', r);
+            }
             storageManager.execQuery({
                 query : "delete from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"
             });
+            r = storageManager.execQuery({
+                query : "select * from documents where initid not in (select initid from docsbydomain)"
+            });
+            if (r.length) {
+                logConsole('****************suppress from doc******************', r);
+            }
             storageManager.execQuery({
                 query : "delete from documents where initid not in (select initid from docsbydomain)"
             });
