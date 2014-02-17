@@ -526,7 +526,44 @@ offlineSynchronize.prototype.pushDocument = function (config) {
 offlineSynchronize.prototype.pullDocuments = function (config) {
     Components.utils.import("resource://modules/events.jsm");
     var onedoc, j = 0,
-        domain = config.domain, currentSync = this;
+        domain = config.domain, currentSync = this,
+        nbSharedDoc = 0,
+        nbUserDoc = 0,
+        afterSharedSynchro = function() {
+            if (nbSharedDoc > 0) {
+                nbSharedDoc = nbSharedDoc - 1;
+                return;
+            }
+            //delete detached document
+            currentSync.deleteDocuments({
+                origin :     'shared',
+                domain :     domain,
+                deleteList : domain.sync().getSharedDocumentsToDelete()
+            });
+        },
+        afterUserSynchro = function() {
+            if (nbUserDoc > 0) {
+                nbUserDoc = nbUserDoc - 1;
+                return;
+            }
+            currentSync.recordFiles({
+                domain :    domain,
+                onSuccess : function () {
+                    currentSync.deleteDocuments({
+                        origin :     'user',
+                        domain :     domain,
+                        deleteList : domain.sync().getUserDocumentsToDelete()
+                    });
+                    applicationEvent.publish("postPullUserDocument");
+                    storageManager.lockDatabase({
+                        lock : false
+                    });
+                    if (config.onSuccess) {
+                        config.onSuccess();
+                    }
+                }
+            });
+        };
     if (config && config.domain) {
         // TODO pull all documents and modified files
         logConsole('Begin pull documents');
@@ -546,26 +583,21 @@ offlineSynchronize.prototype.pullDocuments = function (config) {
         if (shared) {
             this.callObserver('onDetailLabel', ('Recording shared documents : ' + shared.length));
             onedoc = null;
+            nbSharedDoc = shared.length;
             for (j = 0; j < shared.length; j++) {
                 onedoc = shared.getDocument(j);
                 this.recordDocument({
                     domain :   domain,
-                    document : onedoc
+                    document : onedoc,
+                    onSuccess : afterSharedSynchro
                 });
                 logConsole('store : ' + onedoc.getTitle());
                 this.log('pull from share :' + onedoc.getTitle());
                 this.callObserver('onDetailPercent', ((j + 1) / shared.length * 100));
             }
-
+            afterSharedSynchro();
             this.callObserver('onDetailPercent', 100);
         }
-
-        //delete detached document
-        this.deleteDocuments({
-            origin :     'shared',
-            domain :     domain,
-            deleteList : domain.sync().getSharedDocumentsToDelete()
-        });
 
         this.callObserver('onDetailLabel', domain.getTitle() + ' : get user documents');
         var userd = domain.sync().getUserDocuments({
@@ -577,32 +609,19 @@ offlineSynchronize.prototype.pullDocuments = function (config) {
         if (userd) {
             this.callObserver('onDetailLabel', 'Recording user documents : ' + userd.length);
             logConsole('pull users : ' + userd.length);
+            nbUserDoc = userd.length;
             for (j = 0; j < userd.length; j++) {
                 onedoc = userd.getDocument(j);
                 this.recordDocument({
                     domain :   domain,
-                    document : onedoc
+                    document : onedoc,
+                    onSuccess : afterUserSynchro
                 });
                 this.log('pull from user :' + onedoc.getTitle());
                 this.callObserver('onDetailPercent', (j + 1) / userd.length * 100);
             }
-            this.recordFiles({
-                domain : domain,
-                onSuccess: function() {
-                    currentSync.deleteDocuments({
-                        origin :     'user',
-                        domain :     domain,
-                        deleteList : domain.sync().getUserDocumentsToDelete()
-                    });
-                    applicationEvent.publish("postPullUserDocument");
-                    storageManager.lockDatabase({
-                        lock : false
-                    });
-                    if (config.onSuccess) {
-                        config.onSuccess();
-                    }
-                }
-            });
+            afterUserSynchro();
+
         } else {
             throw new SyncException("pull documents failed");
         }
@@ -724,7 +743,7 @@ offlineSynchronize.prototype.updateTitles = function (config) {
     if (config && config.document) {
         var oas = config.document.getAttributes();
         for (var aid in oas) {
-            if (oas[aid].type == 'docid') {
+            if (oas[aid].type == 'docid' || oas[aid].type == 'account') {
                 var values = config.document.getValue(aid);
                 var titles = config.document.getDisplayValue(aid);
                 if (!Array.isArray(values)) {
@@ -834,7 +853,7 @@ offlineSynchronize.prototype.updateEnumItems = function (config) {
 offlineSynchronize.prototype.deleteDocuments = function (config) {
 
     Components.utils.import("resource://modules/events.jsm");
-    var eventManager = applicationEvent, currentSync = this;
+    var eventManager = applicationEvent, currentSync = this, r;
     if (config && config.domain && config.origin && config.deleteList && (config.origin == 'user' || config.origin == 'shared')) {
 
         if (config.deleteList.length > 0) {
@@ -878,9 +897,21 @@ offlineSynchronize.prototype.deleteDocuments = function (config) {
             //logConsole("deleteDocuments", config.deleteList);
         } else {
             logConsole("clean delete documents / 1");
+            /*r = storageManager.execQuery({
+                query : "select * from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"
+            });
+            if (r.length) {
+                logConsole('****************suppress from domain******************', r);
+            }*/
             storageManager.execQuery({
                 query : "delete from docsbydomain where not docsbydomain.isshared and not docsbydomain.isusered"
             });
+            /*r = storageManager.execQuery({
+                query : "select * from documents where initid not in (select initid from docsbydomain)"
+            });
+            if (r.length) {
+                logConsole('****************suppress from doc******************', r);
+            }*/
             storageManager.execQuery({
                 query : "delete from documents where initid not in (select initid from docsbydomain)"
             });
@@ -1567,6 +1598,14 @@ offlineSynchronize.prototype.getLogin = function () {
         this._login = authentificator.currentLogin;
     }
     return this._login;
+}
+/**
+ * Get user Id
+ *
+ * @return int
+ */
+offlineSynchronize.prototype.getUserId = function () {
+    return Preferences.get("offline.user.id");
 }
 
 /**
