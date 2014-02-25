@@ -7,7 +7,6 @@ Cu.import("resource://modules/logger.jsm");
 Cu.import("resource://modules/storageManager.jsm");
 Cu.import("resource://modules/utils.jsm");
 Cu.import("resource://modules/docManager.jsm");
-//Cu.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 
 var EXPORTED_SYMBOLS = ["fileManager"];
 const STATE_START = Components.interfaces.nsIWebProgressListener.STATE_START;
@@ -20,7 +19,6 @@ const TABLE_FILES = 'files';
 const STATUS_DONE = 1;
 const STATUS_UNDEF = -1;
 
-//var privacy = PrivateBrowsingUtils.privacyContextFromWindow(urlSourceWindow);
 var nbMaxDl = 3;
 var filesRoot = Services.dirsvc.get("ProfD", Ci.nsILocalFile);
 filesRoot.append(PATH_FILES);
@@ -584,7 +582,7 @@ function cleanFileSync(config) {
 }
 function saveAFile(config, callback) {
 
-    var error, index;
+    var error, index, conf;
 
     if (config && config.initid && config.attrid && config.basename
         && config.aFile) {
@@ -642,8 +640,8 @@ function saveAFile(config, callback) {
                 config.aFile.permissions = config.writable
                     ? PERMISSIONS_WRITABLE
                     : PERMISSIONS_NOT_WRITABLE;
-                // set ref in database
                 config.index = index;
+                // set ref in database
                 storeFile(config);
                 if ((config.uuid) && (config.attrid != 'icon')) {
                     var localDoc = docManager.getLocalDocument({
@@ -651,10 +649,15 @@ function saveAFile(config, callback) {
                     });
                     if (localDoc) {
                         localDoc.setValue(config.attrid, config.uuid, config.index);
-                        localDoc.save({
+                        conf = {
                             force :              true,
                             noModificationDate : true
-                        });
+                        };
+                        if (localDoc.inMemoryDoc) {
+                            localDoc.store(conf);
+                        } else {
+                            localDoc.save(conf);
+                        }
                     }
                 }
                 if (callback && callback.onSuccess) {
