@@ -14,7 +14,9 @@ pref("toolkit.singletonWindowType", "dcpoffline-main");
 
 /* enable js strict mode */
 pref("javascript.options.strict", true);
-
+//Fix max runtime to 30 minutes
+pref("dom.max_chrome_script_run_time", 1800);
+pref("dom.max_script_run_time", 1800);
 
 /* application prefs */
 // TODO all notations to update and merge with recent
