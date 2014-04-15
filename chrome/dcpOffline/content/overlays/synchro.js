@@ -94,6 +94,7 @@ function initPage() {
 function initListeners() {
     applicationEvent.subscribe("synchronize", synchronize, {onError : errorOfSynchronize});
     applicationEvent.subscribe("preSynchronize", verifySynchroState);
+    applicationEvent.subscribe("postSynchronize", setEndSynchro);
     applicationEvent.subscribe("changeSelectedDomain", updateDomain);
     applicationEvent.subscribe("unableToSynchronize", errorOfSynchronize);
     window.addEventListener("close", canBeClosed, false);
@@ -124,6 +125,10 @@ function synchronize() {
 
 function verifySynchroState() {
     return !window.synchroInProgress;
+}
+
+function setEndSynchro() {
+    window.synchroInProgress = false;
 }
 
 function updateDomain(config) {
