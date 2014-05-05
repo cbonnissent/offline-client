@@ -20,6 +20,7 @@ function tryToAuthent() {
         param.modeOffline = document.getElementById('authent.modeOffline').checked;
 
         Preferences.set("offline.user.login", param.currentLogin);
+        Preferences.set("offline.application.modeOffline", param.modeOffline);
 
         document.getElementById('authent.password').disabled = true;
         document.getElementById('authent.modeOffline').disabled = true;
