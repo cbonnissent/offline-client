@@ -1421,7 +1421,7 @@ Fdl.Context.prototype.setAuthentification = function(config) {
 			app : 'DATA',
 			action : 'USER',
 			method : 'authent'
-		}, config, true);
+		}, config, false);
 		if (userdata.error) {
 			this._isAuthenticated = false;
 			this.setErrorMessage(userdata.error);
